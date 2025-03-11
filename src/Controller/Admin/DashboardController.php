@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\Book;
 use App\Entity\Borrowing;
+use App\Entity\Category;
 use App\Entity\User;
 use Symfony\Component\HttpFoundation\Response;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
@@ -48,10 +49,10 @@ class DashboardController extends AbstractDashboardController
     public function configureMenuItems(): iterable
     {
         yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
-        // yield MenuItem::linkToCrud('The Label', 'fas fa-list', EntityClass::class);
         yield MenuItem::linkToCrud('Utilisateurs', 'fas fa-users', User::class);
         yield MenuItem::linkToCrud('Livres', 'fas fa-book', Book::class);
-        yield MenuItem::linkToCrud('Emprunt', 'fas fa-book', Borrowing::class);
+        yield MenuItem::linkToCrud('Emprunt', 'fas fa-hand', Borrowing::class);
+        yield MenuItem::linkToCrud('Catégorie', 'fas fa-list', Category::class);
         yield MenuItem::section('<hr>');
         yield MenuItem::linkToRoute('Retour au site', 'fas fa-arrow-left', 'todos_index');
     }
