@@ -28,7 +28,7 @@ class Book
     #[ORM\Column(length: 255)]
     private ?string $url = null;
 
-    #[ORM\Column]
+    #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $created_at = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
