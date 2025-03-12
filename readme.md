@@ -66,3 +66,15 @@ La liste des compositions de l'interface de l'application :
   > - RGPD
   > - Mention légale
   > - Politique de confidentialitées
+
+
+A faire : 
+
+  - Trello
+  - Checker l'api des livres (https://developers.google.com/books/docs/v1/libraries?hl=fr)
+  - Sécuriser les accès suivant les roles
+  - Installer tailwindcss
+  - Design avec IA
+  - Page d'historique d'emprunt
+  - Recherche et Filtres Avancés
+  - Support de présentation (fin)
