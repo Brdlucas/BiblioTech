@@ -1,0 +1,67 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Search Books
+{% endblock %}
+
+{% block body %}
+	<div class="max-w-4xl mx-auto px-4 py-8">
+		<h1 class="text-3xl font-semibold text-center mb-8 text-gray-800">Search Books</h1>
+
+		{{ form_start(form) }}
+		<div class="grid grid-cols-1 gap-6 md:grid-cols-3">
+			<div>
+				{{ form_label(form.title, 'Titre du livre', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+				{{ form_widget(form.title, {'attr': {'class': 'p-1 mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500'}}) }}
+			</div>
+
+			<div>
+				{{ form_label(form.author, 'Auteur', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+				{{ form_widget(form.author, {'attr': {'class': 'p-1 mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500'}}) }}
+			</div>
+
+			<div>
+				{{ form_label(form.publication_date, 'Date de publication', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+				{{ form_widget(form.publication_date, {'attr': {'class': 'p-1 mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500'}}) }}
+			</div>
+		</div>
+
+		<div class="mt-6 text-center">
+			<div>
+				{{ form_widget(form.submit, {'attr': {'class': 'm-auto p-1 mt-1 block w-64 border border-gray-300 bg-blue-500 text-white transition hover:bg-blue-400 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500'}}) }}
+			</div>
+		</div>
+		{{ form_end(form) }}
+
+		<h2 class="mt-12 text-xl font-semibold text-gray-800">Results:</h2>
+
+		{% if results is not empty %}
+			<div class="space-y-6 mt-6">
+				{% for book in results %}
+					<div class="p-4 border rounded-md shadow-sm hover:bg-gray-50">
+						<strong class="text-lg text-gray-900">{{ book.volumeInfo.title }}</strong>
+						<div class="text-sm text-gray-600 mt-2">
+							{% if book.volumeInfo.authors is defined and book.volumeInfo.authors is not empty %}
+								{% for author in book.volumeInfo.authors %}
+									<span class="text-gray-700">{{ author }}</span>
+									{% if not loop.last %},
+									{% endif %}
+								{% endfor %}
+							{% else %}
+								<span class="text-gray-500">No authors available</span>
+							{% endif %}
+						</div>
+						<div class="text-sm text-gray-500 mt-2">
+							Published:
+							{{ book.volumeInfo.publishedDate }}
+						</div>
+						<div class="mt-4">
+							<a href="{{ book.volumeInfo.infoLink }}" target="_blank" class="text-blue-500 hover:text-blue-700">More Info</a>
+						</div>
+					</div>
+				{% endfor %}
+			</div>
+		{% else %}
+			<p class="mt-6 text-gray-500">No books found matching your search criteria.</p>
+		{% endif %}
+	</div>
+{% endblock %}
