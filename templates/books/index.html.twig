@@ -37,25 +37,38 @@
 		{% if results is not empty %}
 			<div class="space-y-6 mt-6">
 				{% for book in results %}
-					<div class="p-4 border rounded-md shadow-sm hover:bg-gray-50">
-						<strong class="text-lg text-gray-900">{{ book.volumeInfo.title }}</strong>
-						<div class="text-sm text-gray-600 mt-2">
-							{% if book.volumeInfo.authors is defined and book.volumeInfo.authors is not empty %}
-								{% for author in book.volumeInfo.authors %}
-									<span class="text-gray-700">{{ author }}</span>
-									{% if not loop.last %},
-									{% endif %}
-								{% endfor %}
+					<div
+						class="p-4 border rounded-md shadow-sm hover:bg-gray-50 flex items-start">
+						<!-- Image du livre à gauche -->
+						<div class="w-24 h-32 mr-4">
+							{% if book.volumeInfo.imageLinks is defined and book.volumeInfo.imageLinks.thumbnail is defined %}
+								<img src="{{ book.volumeInfo.imageLinks.thumbnail }}" alt="{{ book.volumeInfo.title }}" class="w-full h-full object-cover rounded-md">
 							{% else %}
-								<span class="text-gray-500">No authors available</span>
+								<img src={{"/img/no-img.png"}} alt="{{ book.volumeInfo.title }}" class="w-full h-full object-contain rounded-md">
 							{% endif %}
 						</div>
-						<div class="text-sm text-gray-500 mt-2">
-							Published:
-							{{ book.volumeInfo.publishedDate }}
-						</div>
-						<div class="mt-4">
-							<a href="{{ book.volumeInfo.infoLink }}" target="_blank" class="text-blue-500 hover:text-blue-700">More Info</a>
+
+						<!-- Contenu des informations sur le livre -->
+						<div class="flex-1">
+							<strong class="text-lg text-gray-900">{{ book.volumeInfo.title }}</strong>
+							<div class="text-sm text-gray-600 mt-2">
+								{% if book.volumeInfo.authors is defined and book.volumeInfo.authors is not empty %}
+									{% for author in book.volumeInfo.authors %}
+										<span class="text-gray-700">{{ author }}</span>
+										{% if not loop.last %},
+										{% endif %}
+									{% endfor %}
+								{% else %}
+									<span class="text-gray-500">No authors available</span>
+								{% endif %}
+							</div>
+							<div class="text-sm text-gray-500 mt-2">
+								Published:
+								{{ book.volumeInfo.publishedDate }}
+							</div>
+							<div class="mt-4">
+								<a href="{{ book.volumeInfo.infoLink }}" target="_blank" class="text-white  bg-blue-400 hover:bg-blue-500 p-3 rounded-lg ">Voir le résumé</a>
+							</div>
 						</div>
 					</div>
 				{% endfor %}
@@ -63,5 +76,6 @@
 		{% else %}
 			<p class="mt-6 text-gray-500">No books found matching your search criteria.</p>
 		{% endif %}
+
 	</div>
 {% endblock %}
