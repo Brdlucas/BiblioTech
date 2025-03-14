@@ -1,0 +1,92 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+	{% if book is not empty %}
+		<!-- Conteneur principal qui prend toute la hauteur de la page -->
+		<div class="mt-0 h-screen flex items-center justify-center bg-gray-100">
+			<div class="max-w-4xl w-full bg-white shadow-lg rounded-lg p-6">
+				<div
+					class="flex flex-col lg:flex-row items-start">
+					<!-- Image du livre -->
+					<div class="w-full lg:w-48 h-64 mb-6 lg:mb-0">
+						{% if book.volumeInfo.imageLinks is defined and book.volumeInfo.imageLinks.extraLarge is defined %}
+							<img src="{{ book.volumeInfo.imageLinks.extraLarge }}" alt="{{ book.volumeInfo.title }}" class="w-full h-full object-cover rounded-md">
+						{% else %}
+							<img src="/img/no-img.png" alt="{{ book.volumeInfo.title }}" class="w-full h-full object-contain rounded-md">
+						{% endif %}
+					</div>
+
+					<!-- Détails du livre -->
+					<div class="flex-1 pl-0 lg:pl-6">
+						<h1 class="text-3xl font-semibold text-gray-900 mb-4">{{ book.volumeInfo.title }}</h1>
+
+						<!-- Auteur(s) -->
+						<div class="text-sm text-gray-600 mb-2">
+							{% if book.volumeInfo.authors is defined and book.volumeInfo.authors is not empty %}
+								<span class="font-medium text-gray-700">Auteur(s):</span>
+								{% for author in book.volumeInfo.authors %}
+									<span class="text-gray-700">{{ author }}</span>
+									{% if not loop.last %},
+									{% endif %}
+								{% endfor %}
+							{% else %}
+								<span class="text-gray-500">Aucun auteur disponible</span>
+							{% endif %}
+						</div>
+
+						<!-- Date de publication -->
+						<div class="text-sm text-gray-500 mb-2">
+							<span class="font-medium">Publié le :</span>
+							{{ book.volumeInfo.publishedDate }}
+						</div>
+
+						<!-- Editeur -->
+						<div class="text-sm text-gray-500 mb-2">
+							<span class="font-medium">Editeur :</span>
+							{{ book.volumeInfo.publisher }}
+						</div>
+
+						<!-- Description -->
+
+						<div class="text-sm text-gray-500 mb-2">
+							<span class="font-medium">Description :</span>
+							<p>{{ book.volumeInfo.description | default('aucune description') }}</p>
+						</div>
+
+						<!-- Nombre de pages -->
+						<div class="text-sm text-gray-500 mb-2">
+							<span class="font-medium">Nombre de pages :</span>
+							<strong>{{ book.volumeInfo.pageCount }}</strong>
+						</div>
+
+						<!-- Note globale -->
+						<div class="text-sm text-gray-500 mb-2">
+							<span class="font-medium">Note globale :</span>
+							<strong>{{ book.volumeInfo.averageRating | default('aucune') }}</strong>
+							sur les
+							<strong>{{ book.volumeInfo.ratingsCount | default('0') }}</strong>
+							utilisateurs
+						</div>
+
+						<!-- Catégorie -->
+						<div class="text-sm text-gray-500 mb-4">
+							{% if book.volumeInfo.categories is defined and book.volumeInfo.categories[0] is not empty %}
+								<span class="font-medium">Catégorie :</span>
+								{{ book.volumeInfo.categories[0] }}
+							{% else %}
+								<span class="text-gray-500">Aucune catégorie disponible</span>
+							{% endif %}
+						</div>
+
+						<!-- Lien pour voir le résumé -->
+						<div class="mt-4">
+							<a href="{{ book.volumeInfo.infoLink }}" target="_blank" class="text-white bg-blue-400 hover:bg-blue-500 p-3 rounded-lg transition duration-200">Voir le résumé</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	{% else %}
+		<p class="mt-6 text-gray-500 text-center">Ce livre n'est pas disponible.</p>
+	{% endif %}
+{% endblock %}
