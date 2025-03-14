@@ -11,7 +11,7 @@
 			<div class="grid grid-cols-1 gap-6 md:grid-cols-3">
 				<div>
 					{{ form_label(form.title, 'Titre du livre', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-					{{ form_widget(form.title, {'attr': {'class': 'mt-2 block w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500'}}) }}
+					{{ form_widget(form.title, {'attr': {'class': 'mt-2 block w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500'}})  }}
 				</div>
 				<div>
 					{{ form_label(form.author, 'Auteur', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
@@ -29,24 +29,20 @@
 			{{ form_end(form) }}
 		</div>
 
-
-		<h2 class="text-3xl font-bold my-5">Resultat :
-		</h2>
+		<h2 class="text-3xl font-bold my-5">Résultat :</h2>
 		<hr>
+
 		{% if results is not empty %}
 			<div class="grid lg:grid-cols-4 gap-8 mt-8">
 				{% for book in results %}
 					<div class="flex flex-col sm:flex-row items-start p-6 bg-white border border-gray-200 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 transform hover:scale-[1.03] min-h-[350px]">
-
-
 						<div class="w-[120px] h-[180px] overflow-hidden rounded-md flex-shrink-0 mx-auto sm:mx-0">
 							{% if book.volumeInfo.imageLinks is defined and book.volumeInfo.imageLinks.thumbnail is defined %}
 								<img src="{{ book.volumeInfo.imageLinks.thumbnail }}" alt="{{ book.volumeInfo.title }}" class="w-full h-full object-cover transition-transform transform hover:scale-[1.1] duration-300">
 							{% else %}
-								<img src="/img/no-img.png" alt="{{ book.volumeInfo.title }}" class="w-full h-full object-contain">
+								<img src="/img/no-img.png" width="128" height="128" alt="{{ book.volumeInfo.title }}" class="object-cover transition-transform transform hover:scale-[1.1] duration-300">
 							{% endif %}
 						</div>
-
 
 						<div class="flex flex-col justify-between mt-4 sm:mt-0 sm:ml-6 space-y-2">
 							<h3 class="text-lg font-bold text-gray-900 mb-2 line-clamp-2">{{ book.volumeInfo.title }}</h3>
@@ -65,7 +61,6 @@
 							<p class="text-sm text-gray-500 mb-2">Publié le :
 								{{ book.volumeInfo.publishedDate }}</p>
 
-
 							<a href="{{ path('app_book_id', { 'id': book.id }) }}" class="p-3 w-full sm:w-32 mt-6 px-[20px] py-[10px] bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-400 hover:to-indigo-400 text-white rounded-md shadow-md transition-transform transform hover:translate-y-[5px] duration-[300ms]">
 								Voir le résumé
 							</a>
@@ -76,6 +71,5 @@
 		{% else %}
 			<p class="mt-6 text-center text-gray-500">Aucun livre ne correspond au critère de recherche.</p>
 		{% endif %}
-
 	</div>
 {% endblock %}
