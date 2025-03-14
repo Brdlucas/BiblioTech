@@ -1,5 +1,5 @@
 <?php
-// src/Controller/BookController.php
+
 namespace App\Controller;
 
 use App\Form\SearchType;
@@ -15,28 +15,29 @@ class BookController extends AbstractController
     private $client;
     private $logger;
 
-    // Injection des services nécessaires
     public function __construct(HttpClientInterface $client, LoggerInterface $logger)
     {
         $this->client = $client;
         $this->logger = $logger;
     }
 
-    #[Route('/books', name: 'app_books', methods: ['GET', 'POST'])]
-    public function index(Request $request): Response
+    #[Route('/books', name: 'app_books', methods: ['GET', 'POST'])] public function index(Request $request)
     {
+
+        $value = $request->query->get('value');
+
         // Récupération de la clé API dans la méthode, pas dans le constructeur
         $googleBooksApiKey = $this->getParameter('google_books_api_key');
 
         // Valeurs par défaut pour les filtres
         $defaultFilters = [
-            'title' => 'Harry Potter',  // Exemple de titre par défaut
-            'author' => null,           // Pas de valeur par défaut pour l'auteur
-            'publication_date' => null  // Pas de valeur par défaut pour la date
+            'title' => $value ?? '',
+            'author' => null,
+            'publication_date' => null
         ];
 
         // Création et gestion du formulaire de recherche
-        $form = $this->createForm(SearchType::class, $defaultFilters);  // Passer les valeurs par défaut au formulaire
+        $form = $this->createForm(SearchType::class, $defaultFilters);
         $form->handleRequest($request);
 
         // Si le formulaire est soumis et valide, on récupère les filtres
@@ -46,20 +47,31 @@ class BookController extends AbstractController
             'publication_date' => $form->get('publication_date')->getData(),
         ];
 
-        // Si le formulaire n'est pas soumis, on applique les valeurs par défaut
-        if (!$form->isSubmitted() || !$form->isValid()) {
-            // Si pas soumis ou valide, on effectue une recherche avec les valeurs par défaut
-            $googleBooksResults = $this->searchGoogleBooks($defaultFilters, $googleBooksApiKey);
-        } else {
-            // Si le formulaire est soumis et valide, on effectue la recherche avec les filtres donnés
-            $googleBooksResults = $this->searchGoogleBooks($filters, $googleBooksApiKey);
-        }
 
+        if ($request->headers->get('referer') == "https://127.0.0.1:8000/") {
+            if (!empty($value)) {
+
+                $googleBooksResults = $this->searchGlobalGoogleBooks($value, $googleBooksApiKey);
+            } else {
+
+                $googleBooksResults = $this->searchGlobalGoogleBooks("Harry Potter", $googleBooksApiKey);
+            }
+        } else {
+
+            if (!$form->isSubmitted() || !$form->isValid()) {
+
+                $googleBooksResults = $this->searchGoogleBooks($defaultFilters, $googleBooksApiKey);
+            } else {
+
+                $googleBooksResults = $this->searchGoogleBooks($filters, $googleBooksApiKey);
+            }
+        }
         return $this->render('books/index.html.twig', [
             'form' => $form->createView(),
-            'results' => $googleBooksResults ?? [], // Résultats de l'API
+            'results' => $googleBooksResults ?? [],
         ]);
     }
+
 
     private function searchGoogleBooks(array $filters, string $googleBooksApiKey)
     {
@@ -81,7 +93,7 @@ class BookController extends AbstractController
         }
 
         if (empty($query)) {
-            return []; // Retourne un tableau vide si aucun filtre n'est sélectionné
+            return [];
         }
 
         // Construire l'URL de la requête
@@ -95,20 +107,42 @@ class BookController extends AbstractController
             // Renvoi des résultats obtenus de l'API
             return $data['items'] ?? [];
         } catch (\Exception $e) {
-            // Log l'erreur en cas d'échec de la requête
             $this->logger->error('Google Books API error: ' . $e->getMessage());
             return [];
         }
     }
 
-    private function getBookDetail(string $id, string $googleBooksApiKey)
+    private function searchGlobalGoogleBooks(string $query, string $googleBooksApiKey)
     {
-        $url = "https://www.googleapis.com/books/v1/volumes/" . urlencode($id) . "?key=" . $googleBooksApiKey;
+        if (empty($query)) {
+            return [];
+        }
+
+        // Encoder la chaîne de recherche
+        $queryStr = urlencode($query);
+
+        // Construire l'URL de la requête vers l'API Google Books
+        $url = 'https://www.googleapis.com/books/v1/volumes?q=' . $queryStr . '&maxResults=3&key=' . $googleBooksApiKey;
 
         try {
+            // Effectuer la requête HTTP
             $response = $this->client->request('GET', $url);
             $data = $response->toArray();
 
+            return $data['items'] ?? [];
+        } catch (\Exception $e) {
+            $this->logger->error('Google Books API error: ' . $e->getMessage());
+            return [];
+        }
+    }
+
+
+    private function getBookDetail(string $id, string $googleBooksApiKey)
+    {
+        $url = "https://www.googleapis.com/books/v1/volumes/" . urlencode($id) . "?key=" . $googleBooksApiKey;
+        try {
+            $response = $this->client->request('GET', $url);
+            $data = $response->toArray();
             // Renvoi des résultats obtenus de l'API
             return $data ?? [];
         } catch (\Exception $e) {
@@ -122,7 +156,6 @@ class BookController extends AbstractController
     #[Route('/book/{id}', name: 'app_book_id', methods: ['GET'])]
     public function book(Request $request, string $id): Response
     {
-
         $googleBooksApiKey = $this->getParameter('google_books_api_key');
 
         $googleBookIdResult = $this->getBookDetail($id, $googleBooksApiKey);
