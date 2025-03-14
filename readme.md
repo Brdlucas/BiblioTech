@@ -2,6 +2,12 @@
 ---
 Application d'emprunt et réservation de livres en ligne
 
+### Commandes
+---
+
+lancement du serveur : symfony server:start
+arret du serveur : symfony server:stop
+tailwindcss : php bin/console tailwind:build --watch
 
 ### Stack
 ---
