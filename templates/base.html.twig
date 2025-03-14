@@ -10,6 +10,8 @@
 		</title>
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"> {% block stylesheets %}{% endblock %}
 		</head>
+		{% include 'components/search_form.html.twig' %}
+
 		<body class="bg-gray-100"> {% block body %}{% endblock %}{% block javascripts %}{% endblock %}
 			</body>
 		</html>

@@ -5,70 +5,71 @@
 
 {% block body %}
 	<div class="max-w-8xl mx-auto px-4 py-8">
-		<div class="max-w-4xl m-auto">
-			<h1 class="text-3xl font-semibold text-center mb-8 text-gray-800">Rechercher des livres</h1>
+
+		<div class="mt-12 max-w-4xl mx-auto bg-white bg-opacity-90 rounded-xl shadow-xl p-8 border border-indigo-200">
 			{{ form_start(form) }}
 			<div class="grid grid-cols-1 gap-6 md:grid-cols-3">
 				<div>
 					{{ form_label(form.title, 'Titre du livre', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-					{{ form_widget(form.title, {'attr': {'class': 'p-1 mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500'}}) }}
+					{{ form_widget(form.title, {'attr': {'class': 'mt-2 block w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500'}})  }}
 				</div>
-
 				<div>
 					{{ form_label(form.author, 'Auteur', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-					{{ form_widget(form.author, {'attr': {'class': 'p-1 mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500'}}) }}
+					{{ form_widget(form.author, {'attr': {'class': 'mt-2 block w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500'}}) }}
 				</div>
-
 				<div>
 					{{ form_label(form.publication_date, 'Date de publication', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-					{{ form_widget(form.publication_date, {'attr': {'class': 'p-1 mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500'}}) }}
+					{{ form_widget(form.publication_date, {'attr': {'class': 'mt-2 block w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500'}}) }}
 				</div>
 			</div>
-		</div>
-		<div class="mt-6 text-center">
-			<div>
-				{{ form_widget(form.submit, {'attr': {'class': 'm-auto p-1 mt-1 block w-64 border border-gray-300 bg-blue-500 text-white transition hover:bg-blue-400 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500'}}) }}
+
+			<div class="mt-8 flex justify-center">
+				{{ form_widget(form.submit, {'attr': {'class': 'px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-400 hover:to-indigo-400 text-white font-semibold rounded-full shadow-md transition-transform transform hover:scale-[1.05] duration-[300ms]'}}) }}
 			</div>
+			{{ form_end(form) }}
 		</div>
-		{{ form_end(form) }}
-		<h2 class="mt-12 text-xl font-semibold text-gray-800">Résultats:</h2>
+
+		<h2 class="text-3xl font-bold my-5">Résultat :</h2>
+		<hr>
+
 		{% if results is not empty %}
-			<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+			<div class="grid lg:grid-cols-4 gap-8 mt-8">
 				{% for book in results %}
-					<div class="p-4 border rounded-md shadow-sm hover:bg-gray-50 flex flex-col items-start w-full">
-						<div class="w-24 h-32 mb-4">
+					<div class="flex flex-col sm:flex-row items-start p-6 bg-white border border-gray-200 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 transform hover:scale-[1.03] min-h-[350px]">
+						<div class="w-[120px] h-[180px] overflow-hidden rounded-md flex-shrink-0 mx-auto sm:mx-0">
 							{% if book.volumeInfo.imageLinks is defined and book.volumeInfo.imageLinks.thumbnail is defined %}
-								<img src="{{ book.volumeInfo.imageLinks.thumbnail }}" alt="{{ book.volumeInfo.title }}" class="w-full h-full object-cover rounded-md">
+								<img src="{{ book.volumeInfo.imageLinks.thumbnail }}" alt="{{ book.volumeInfo.title }}" class="w-full h-full object-cover transition-transform transform hover:scale-[1.1] duration-300">
 							{% else %}
-								<img src={{"/img/no-img.png"}} alt="{{ book.volumeInfo.title }}" class="w-full h-full object-contain rounded-md">
+								<img src="/img/no-img.png" width="128" height="128" alt="{{ book.volumeInfo.title }}" class="object-cover transition-transform transform hover:scale-[1.1] duration-300">
 							{% endif %}
 						</div>
-						<div class="flex-1">
-							<strong class="text-lg text-gray-900">{{ book.volumeInfo.title }}</strong>
-							<div class="text-sm text-gray-600 mt-2">
+
+						<div class="flex flex-col justify-between mt-4 sm:mt-0 sm:ml-6 space-y-2">
+							<h3 class="text-lg font-bold text-gray-900 mb-2 line-clamp-2">{{ book.volumeInfo.title }}</h3>
+							<p class="text-sm text-gray-600 mb-2 line-clamp-2">
 								{% if book.volumeInfo.authors is defined and book.volumeInfo.authors is not empty %}
+									Par :
 									{% for author in book.volumeInfo.authors %}
-										<span class="text-gray-700">{{ author }}</span>
+										<span class="text-blue-600 font-medium">{{ author }}</span>
 										{% if not loop.last %},
 										{% endif %}
 									{% endfor %}
 								{% else %}
-									<span class="text-gray-500">No authors available</span>
+									<span class="text-gray-500">Auteur inconnu</span>
 								{% endif %}
-							</div>
-							<div class="text-sm text-gray-500 mt-2">
-								Publier le :
-								{{ book.volumeInfo.publishedDate }}
-							</div>
-							<div class="mt-4">
-								<a href="{{ path(book.id, "app_book_id") }}" target="_blank" class="text-white bg-blue-400 hover:bg-blue-500 p-3 rounded-lg ">Voir le résumé</a>
-							</div>
+							</p>
+							<p class="text-sm text-gray-500 mb-2">Publié le :
+								{{ book.volumeInfo.publishedDate }}</p>
+
+							<a href="{{ path('app_book_id', { 'id': book.id }) }}" class="p-3 w-full sm:w-32 mt-6 px-[20px] py-[10px] bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-400 hover:to-indigo-400 text-white rounded-md shadow-md transition-transform transform hover:translate-y-[5px] duration-[300ms]">
+								Voir le résumé
+							</a>
 						</div>
 					</div>
 				{% endfor %}
 			</div>
 		{% else %}
-			<p class="mt-6 text-gray-500">Aucun livres ne correspond au critère de recherche.</p>
+			<p class="mt-6 text-center text-gray-500">Aucun livre ne correspond au critère de recherche.</p>
 		{% endif %}
 	</div>
 {% endblock %}

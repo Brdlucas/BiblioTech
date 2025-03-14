@@ -35,7 +35,11 @@ class SearchType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => null,  // No entity linked to this form
+            'data' => [
+                'title' => null,
+                'author' => null,
+                'publication_date' => null,
+            ]
         ]);
     }
 }

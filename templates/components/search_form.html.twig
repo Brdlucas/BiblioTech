@@ -1,0 +1,31 @@
+{% block body %}
+	<div
+		class="bg-indigo-600 shadow-md">
+		<!-- Navbar -->
+		<nav
+			class="max-w-8xl mx-auto px-4 py-4 flex items-center justify-between">
+			<!-- Logo ou nom de site (page d'accueil à gauche) -->
+			<a href="{{ path('app_homepage') }}" class="text-white text-2xl font-semibold hover:text-indigo-200 transition duration-200">
+				BiblioTech
+			</a>
+
+			<!-- Barre de recherche au centre -->
+			<div class="flex-grow flex justify-center">
+				<form action="{{ path('app_books') }}" method="get" class="flex items-center space-x-4 w-full max-w-4xl">
+					<input type="text" name="value" placeholder="Rechercher un livre..." class="px-4 py-2 rounded-lg bg-white border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 w-full"/>
+					<button type="submit" class="p-3 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-400 hover:to-indigo-400 text-white font-semibold rounded-full shadow-md transition-transform transform hover:scale-[1.05] duration-[300ms]">
+						Rechercher
+					</button>
+				</form>
+			</div>
+
+			<!-- Boutons de navigation à droite -->
+			<div class="hidden md:flex space-x-6">
+				<a href="{{ path('app_books') }}" class="text-white hover:text-indigo-200 transition duration-200">Livres</a>
+				<a href="{{ path('app_register') }}" class="text-white hover:text-indigo-200 transition duration-200">Inscription</a>
+				<a href="{{ path('app_login') }}" class="text-white hover:text-indigo-200 transition duration-200">Connexion</a>
+			</div>
+		</nav>
+	</div>
+
+{% endblock %}
