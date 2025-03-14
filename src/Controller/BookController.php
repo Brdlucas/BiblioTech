@@ -61,10 +61,8 @@ class BookController extends AbstractController
         ]);
     }
 
-    // Fonction pour effectuer la recherche auprès de l'API Google Books
     private function searchGoogleBooks(array $filters, string $googleBooksApiKey)
     {
-        // Tableau pour les critères de recherche
         $query = [];
 
         // Si l'utilisateur a renseigné un titre, on l'ajoute à la requête
@@ -82,7 +80,6 @@ class BookController extends AbstractController
             $query[] = 'publishedDate:' . $filters['publication_date']->format('Y');
         }
 
-        // Si la chaîne de requête est vide (pas de filtre), on utilise une valeur par défaut
         if (empty($query)) {
             return []; // Retourne un tableau vide si aucun filtre n'est sélectionné
         }
@@ -102,5 +99,36 @@ class BookController extends AbstractController
             $this->logger->error('Google Books API error: ' . $e->getMessage());
             return [];
         }
+    }
+
+    private function getBookDetail(string $id, string $googleBooksApiKey)
+    {
+        $url = "https://www.googleapis.com/books/v1/volumes/" . urlencode($id) . "?key=" . $googleBooksApiKey;
+
+        try {
+            $response = $this->client->request('GET', $url);
+            $data = $response->toArray();
+
+            // Renvoi des résultats obtenus de l'API
+            return $data ?? [];
+        } catch (\Exception $e) {
+            // Log l'erreur en cas d'échec de la requête
+            $this->logger->error('Google Books API error: ' . $e->getMessage());
+            return [];
+        }
+    }
+
+
+    #[Route('/book/{id}', name: 'app_book_id', methods: ['GET'])]
+    public function book(Request $request, string $id): Response
+    {
+
+        $googleBooksApiKey = $this->getParameter('google_books_api_key');
+
+        $googleBookIdResult = $this->getBookDetail($id, $googleBooksApiKey);
+
+        return $this->render('books/book.html.twig', [
+            'book' => $googleBookIdResult ?? [], // Résultats de l'API
+        ]);
     }
 }
