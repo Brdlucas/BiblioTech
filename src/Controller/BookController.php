@@ -170,7 +170,9 @@ class BookController extends AbstractController
         // Vérification du nombre d'emprunts
         $user = $this->getUser();
         $borrowings = $entityManager->getRepository(Borrowing::class)->findBy(['userbook' => $user->getId()]);
-        if (count($borrowings) >= 5) {
+
+        if (count($borrowings) > 5) {
+            $this->addFlash('danger', 'Vous avez déjà emprunté 5 livres.');
             return $this->redirectToRoute('app_books');
         }
 
@@ -223,7 +225,7 @@ class BookController extends AbstractController
         ]);
 
         if ($existingBorrowing) {
-            $this->addFlash('error', 'Vous avez déjà emprunté ce livre.');
+            $this->addFlash('danger', 'Vous avez déjà emprunté ce livre.');
             return $this->redirectToRoute('app_books');
         }
 
