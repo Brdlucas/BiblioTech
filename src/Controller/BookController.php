@@ -166,10 +166,12 @@ class BookController extends AbstractController
         if (!$this->getUser()) {
             return $this->redirectToRoute('app_login');
         }
-
+       
         $googleBooksApiKey = $this->getParameter('google_books_api_key');
         $googleBookIdResult = $this->getBookDetail($id, $googleBooksApiKey);
-        $bookInt = $googleBookIdResult['volumeInfo'];
+        //dd($googleBookIdResult);
+        //$bookInt = $googleBookIdResult['volumeInfo'];
+        
 
         // Supposons que le nom de la catégorie soit 'Horror'
         $categoryName = $bookInt['categories'][0] ?? 'Aucune catégorie';
@@ -223,6 +225,8 @@ class BookController extends AbstractController
         $entityManager->persist($borrowing);
         $entityManager->flush();
 
+            $this->addFlash('success', "Votre emprunt a bien été enregistré et soumis à l'autosisation de l'administrateur !");
+      
         return $this->render('books/book.html.twig', [
             'book' => $googleBookIdResult ?? [], // Résultats de l'API
         ]);
