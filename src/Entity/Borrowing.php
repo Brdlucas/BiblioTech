@@ -25,6 +25,9 @@ class Borrowing
     #[ORM\ManyToOne(inversedBy: 'borrowings')]
     private ?User $userbook = null;
 
+    #[ORM\Column]
+    private ?bool $is_verified = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -74,6 +77,18 @@ class Borrowing
     public function setUserbook(?User $userbook): static
     {
         $this->userbook = $userbook;
+
+        return $this;
+    }
+
+    public function isVerified(): ?bool
+    {
+        return $this->is_verified;
+    }
+
+    public function setIsVerified(bool $is_verified): static
+    {
+        $this->is_verified = $is_verified;
 
         return $this;
     }
