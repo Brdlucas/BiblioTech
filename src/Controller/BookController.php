@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Validator\Constraints\Length;
 
 class BookController extends AbstractController
 {
@@ -87,7 +88,6 @@ class BookController extends AbstractController
             $query[] = 'inauthor:' . urlencode($filters['author']);
         }
 
-
         if (empty($query)) {
             return [];
         }
@@ -160,12 +160,19 @@ class BookController extends AbstractController
         ]);
     }
 
-    #[Route('/borrowing/{id}', name: 'app_borrowing_id', methods: ['POST'])]
+    #[Route('/borrowing/{id}', name: 'app_borrowing_id', methods: ['GET', 'POST'])]
     public function borrowing(Request $request, string $id, EntityManagerInterface $entityManager): Response
     {
         if (!$this->getUser()) {
             return $this->redirectToRoute('app_login');
         }
+        $user = $this->getUser();
+        $borrowings = $entityManager->getRepository(Borrowing::class)->findBy(['userbook' => $user->getId()]);
+        // $borrowings = $entityManager->getRepository(Borrowing::class)->findAll();
+
+        if (count($borrowings) >= 5) {
+        }
+
 
         $googleBooksApiKey = $this->getParameter('google_books_api_key');
         $googleBookIdResult = $this->getBookDetail($id, $googleBooksApiKey);
@@ -214,11 +221,14 @@ class BookController extends AbstractController
             $book = $existingBook;
         }
 
+
+
         $borrowing = new Borrowing();
         $borrowing->setBook($book);
         $borrowing->setUserbook($this->getUser());
         $borrowing->setEmpruntedAt(new \DateTimeImmutable());
         $borrowing->setRenderedAt(new \DateTimeImmutable('+10 days'));
+        $borrowing->setIsVerified(false);
 
         $entityManager->persist($borrowing);
         $entityManager->flush();
