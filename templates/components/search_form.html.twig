@@ -24,9 +24,11 @@
 				<a href="{{ path('app_books') }}" class="text-white hover:text-indigo-200 transition duration-200">Livres</a>
 				{% if app.user %}
 					<a href="{{ path('app_borrowing_history') }}" class="text-white hover:text-indigo-200 transition duration-200">Emprunts</a>
+					<a href="{{ path('app_logout') }}" class="text-white hover:text-indigo-200 transition duration-200">Déconnexion</a>
+				{% else %}
+					<a href="{{ path('app_register') }}" class="text-white hover:text-indigo-200 transition duration-200">Inscription</a>
+					<a href="{{ path('app_login') }}" class="text-white hover:text-indigo-200 transition duration-200">Connexion</a>
 				{% endif %}
-				<a href="{{ path('app_register') }}" class="text-white hover:text-indigo-200 transition duration-200">Inscription</a>
-				<a href="{{ path('app_login') }}" class="text-white hover:text-indigo-200 transition duration-200">Connexion</a>
 			</div>
 		</nav>
 	</div>
