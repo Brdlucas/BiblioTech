@@ -235,7 +235,7 @@ class BookController extends AbstractController
         $borrowing->setUserbook($this->getUser());
         $borrowing->setEmpruntedAt(new \DateTimeImmutable());
         $borrowing->setRenderedAt(new \DateTimeImmutable('+10 days'));
-        $borrowing->setIsVerified(false);
+        $borrowing->setStatus('waiting');
 
         $entityManager->persist($borrowing);
         $entityManager->flush();
