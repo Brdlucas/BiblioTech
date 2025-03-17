@@ -40,9 +40,10 @@ class Book
     #[ORM\OneToMany(targetEntity: Borrowing::class, mappedBy: 'book')]
     private Collection $borrowings;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(inversedBy: 'book')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Category $category = null;
+
 
     public function __construct()
     {
@@ -161,7 +162,7 @@ class Book
         return $this->category;
     }
 
-    public function setCategory(Category $category): static
+    public function setCategory(?Category $category): static
     {
         $this->category = $category;
 
