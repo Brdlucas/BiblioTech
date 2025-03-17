@@ -1,17 +1,26 @@
-<!-- base.html.twig -->
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>
-			{% block title %}My Book Search
-			{% endblock %}
-		</title>
-		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"> {% block stylesheets %}{% endblock %}
-		</head>
-		{% include 'components/search_form.html.twig' %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}My Book Search{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    {% block stylesheets %}{% endblock %}
+</head>
+<body class="bg-gray-100 relative">
+    {% include 'components/search_form.html.twig' %}
 
-		<body class="bg-gray-100"> {% block body %}{% endblock %}{% block javascripts %}{% endblock %}
-			</body>
-		</html>
+    {% block body %}{% endblock %}
+
+    <div id="flash-container" class="fixed top-5 right-5">
+        {% for message in app.flashes('success') %}
+            <div class="bg-green-500 text-white px-6 py-3 rounded shadow-md flex justify-between items-center">
+                <span class="text-lg">{{ message }}</span>
+                <button onclick="this.parentElement.remove()" class="ml-6 text-2xl font-bold">&times;</button>
+            </div>
+        {% endfor %}
+    </div>
+
+    {% block javascripts %}{% endblock %}
+</body>
+</html>
