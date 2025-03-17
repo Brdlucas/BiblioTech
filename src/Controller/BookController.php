@@ -160,50 +160,45 @@ class BookController extends AbstractController
         ]);
     }
 
-    #[Route('/borrowing/{id}', name: 'app_borrowing_id', methods: ['GET', 'POST'])]
+    #[Route('/borrowing/{id}', name: 'app_borrowing_id', methods: ['POST'])]
     public function borrowing(Request $request, string $id, EntityManagerInterface $entityManager): Response
     {
         if (!$this->getUser()) {
             return $this->redirectToRoute('app_login');
         }
-      
+
+        // Vérification du nombre d'emprunts
         $user = $this->getUser();
         $borrowings = $entityManager->getRepository(Borrowing::class)->findBy(['userbook' => $user->getId()]);
-
-
         if (count($borrowings) >= 5) {
+            return $this->redirectToRoute('app_books');
         }
-      
+
+        // Récupération des informations du livre via l'API Google Books
         $googleBooksApiKey = $this->getParameter('google_books_api_key');
         $googleBookIdResult = $this->getBookDetail($id, $googleBooksApiKey);
-        
+        $bookInt = $googleBookIdResult['volumeInfo'];
 
-        //Récupération d'une catogires ou bien valeur par défaut
+
+        // Vérification et récupération ou création de la catégorie
         $categoryName = $bookInt['categories'][0] ?? 'Aucune catégorie';
-
-        // Vérifie si la catégorie existe déjà
         $category = $entityManager->getRepository(Category::class)->findOneBy(['name' => $categoryName]);
-
         if (!$category) {
-            // Si la catégorie n'existe pas, on la crée
             $category = new Category();
             $category->setName($categoryName);
-
-            // Persiste et enregistre la nouvelle catégorie
             $entityManager->persist($category);
             $entityManager->flush();
         }
 
-
-        $title = $bookInt['title'] ?? 'Unknown Title';
-        $author = $bookInt['authors'][0] ?? 'Unknown Author';
+        // Récupération des données du livre ou création du livre
+        $title = $bookInt['title'] ?? 'Aucun titre';
+        $author = $bookInt['authors'][0] ?? 'Aucun auteur';
         $image = $bookInt['imageLinks']['smallThumbnail'] ?? "/img/no-img.png";
         $url = $bookInt['infoLink'] ?? "aucun lien";
-        $content = $bookInt['description'] ?? 'No description available';
+        $content = $bookInt['description'] ?? 'Aucune description disponible';
         $publishedDate = $bookInt['publishedDate'] ?? '1970-01-01'; // Par défaut une vieille date
 
-        $existingBook = $entityManager->getRepository(Book::class)->findOneBy(['title' => $bookInt['title'] ?? null]);
-
+        $existingBook = $entityManager->getRepository(Book::class)->findOneBy(['title' => $title]);
         if (!$existingBook) {
             $book = new Book();
             $book->setTitle($title);
@@ -221,8 +216,18 @@ class BookController extends AbstractController
             $book = $existingBook;
         }
 
+        // Vérifier si l'utilisateur a déjà emprunté ce livre
+        $existingBorrowing = $entityManager->getRepository(Borrowing::class)->findOneBy([
+            'userbook' => $this->getUser(),
+            'book' => $book
+        ]);
 
+        if ($existingBorrowing) {
+            $this->addFlash('error', 'Vous avez déjà emprunté ce livre.');
+            return $this->redirectToRoute('app_books');
+        }
 
+        // Création d'un nouvel emprunt
         $borrowing = new Borrowing();
         $borrowing->setBook($book);
         $borrowing->setUserbook($this->getUser());
@@ -233,8 +238,8 @@ class BookController extends AbstractController
         $entityManager->persist($borrowing);
         $entityManager->flush();
 
-            $this->addFlash('success', "Votre emprunt a bien été enregistré et soumis à l'autosisation de l'administrateur !");
-      
+        $this->addFlash('success', "Votre emprunt a bien été enregistré et soumis à l'autosisation de l'administrateur !");
+
         return $this->render('books/book.html.twig', [
             'book' => $googleBookIdResult ?? [], // Résultats de l'API
         ]);
