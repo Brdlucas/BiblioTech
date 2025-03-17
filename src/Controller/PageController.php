@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use Dompdf\Dompdf;
+use Dompdf\Options;
 use App\Entity\Borrowing;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -47,5 +49,44 @@ final class PageController extends AbstractController
         }
 
         return $this->redirectToRoute('app_borrowing_history');
+    }
+
+
+
+    #[Route('/borrowing/{id}/pdf/view', name: 'borrowing_pdf_view')]
+    public function viewPdf(EntityManagerInterface $entityManager, int $id): Response
+    {
+        // Récupérer l'emprunt en base de données
+        $borrowing = $entityManager->getRepository(Borrowing::class)->find($id);
+
+        if (!$borrowing) {
+            throw $this->createNotFoundException('Emprunt non trouvé.');
+        }
+
+        // Options DomPDF
+        $options = new Options();
+        $options->set('defaultFont', 'Helvetica');
+        $options->set('isHtml5ParserEnabled', true);
+
+        // Initialisation de DomPDF
+        $dompdf = new Dompdf($options);
+
+        // Générer le HTML avec Twig
+        $html = $this->renderView('page/pdf-generator.html.twig', [
+            'borrowing' => $borrowing,
+        ]);
+
+        // Charger le HTML
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+
+        // Obtenir le contenu du PDF en sortie
+        $pdfOutput = $dompdf->output();
+
+        // Afficher le PDF dans une nouvelle page (sans téléchargement)
+        return new Response($pdfOutput, 200, [
+            'Content-Type' => 'application/pdf',
+        ]);
     }
 }
