@@ -23,16 +23,19 @@ class BookCrudController extends AbstractCrudController
     {
         return [
             TextField::new('title', 'Titre'),
-            TextEditorField::new('Content', 'Contenu'),
-            TextEditorField::new('Image', 'Image'),
-            TextEditorField::new('Url', 'URL du PDF'),
+            TextField::new('content', 'Contenu'),
+            TextField::new('image', 'Image'),
+            TextField::new('url', 'URL du PDF'),
+            AssociationField::new('category', 'Catégorie')
+                ->setCrudController(CategoryCrudController::class)  // Lien vers le gestionnaire de catégories
+                ->setFormTypeOptions([
+                    'by_reference' => false,  // Permet de gérer la relation en tant que nouvelle association
+                ])
+                ->setRequired(true),  // Facultatif : rendre le champ obligatoire pour un livre
             DateField::new('created_at', 'Créé le'),
             DateField::new('published_at', 'Publié le'),
-            AssociationField::new('category', 'Catégorie')
-                ->setCrudController(CategoryCrudController::class)
-                ->setFormTypeOptions([
-                    'by_reference' => false,
-                ])
+
+            // AssociationField pour la catégorie
         ];
     }
 }
