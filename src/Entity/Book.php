@@ -22,7 +22,7 @@ class Book
     #[ORM\Column(type: Types::TEXT)]
     private ?string $content = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 1024)]
     private ?string $image = null;
 
     #[ORM\Column(length: 255)]
