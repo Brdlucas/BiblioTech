@@ -10,7 +10,6 @@
 					{% set book = borrowing.book %}
 					<div class="bg-white shadow-md rounded-lg p-4">
 						<img src="{{ book.image }}" alt="{{ book.title }}" class="w-full h-48 object-cover rounded-lg">
-
 						<h3 class="text-lg font-semibold mt-2">{{ book.title }}</h3>
 						<p class="text-gray-600 text-sm">Auteur :
 							{{ book.author }}</p>
@@ -25,19 +24,29 @@
 						<p class="mt-2 text-sm text-gray-700">
 							{{ book.content|slice(0, 100) }}...
 						</p>
-
-						<div class="mt-4 flex justify-between items-center">
-							<a href="{{ path('borrowing_pdf_view', { 'id': borrowing.id }) }}" target="_blank" class="btn btn-primary">
-								📄 Voir le rendu
-							</a>
-							<span class="text-gray-500 text-xs">Retour prévu :
-								{{ borrowing.renderedAt|date('d/m/Y') }}</span>
-						</div>
+						{% if borrowing.status == 'approved' %}
+							<div class="mt-4 flex justify-between items-center">
+								<a href="{{ path('borrowing_pdf_view', { 'id': borrowing.id }) }}" target="_blank" class="btn btn-primary">
+									📄 Voir le rendu
+								</a>
+								<span class="text-gray-500 text-xs">Retour prévu :
+									{{ borrowing.renderedAt|date('d/m/Y') }}</span>
+							</div>
+						{% endif %}
 						<form action="{{ path('app_delete_borrowing_id', {'id': borrowing.id}) }}" method="post" class="flex justify-self-end">
 							<button type="submit" class="bg-red-500 text-white py-1 px-4 rounded-lg hover:bg-red-600 ">
 								Retourner le livre
 							</button>
 						</form>
+						{% if borrowing.status == 'waiting' %}
+							<span class="px-3 py-2 bg-yellow-500 rounded-xl text-white">En attente</span>
+						{% elseif borrowing.status == 'approved' %}
+							<span class="px-3 py-2 bg-green-600 rounded-xl text-white">Approuvé</span>
+						{% elseif borrowing.status == 'refused' %}
+							<span class="px-3 py-2 bg-red-600 rounded-xl text-white">Refusé</span>
+						{% elseif borrowing.status == 'returned' %}
+							<span class="px-3 py-2 bg-green-700 rounded-xl text-white">Retourné</span>
+						{% endif %}
 					</div>
 				{% endfor %}
 			</div>
