@@ -2,6 +2,12 @@
 ---
 Application d'emprunt et réservation de livres en ligne
 
+### Commandes
+---
+
+lancement du serveur : symfony server:start
+arret du serveur : symfony server:stop
+tailwindcss : php bin/console tailwind:build --watch
 
 ### Stack
 ---
@@ -66,3 +72,15 @@ La liste des compositions de l'interface de l'application :
   > - RGPD
   > - Mention légale
   > - Politique de confidentialitées
+
+
+A faire : 
+
+  - Trello
+  - ~~Checker l'api des livres (https://developers.google.com/books/docs/v1/libraries?hl=fr)~~
+  - Sécuriser les accès suivant les roles
+  - ~~Installer tailwindcss~~
+  - Design avec IA
+  - Page d'historique d'emprunt
+  - ~~Recherche et Filtres Avancés~~
+  - Support de présentation (fin)
