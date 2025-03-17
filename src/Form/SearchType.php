@@ -28,7 +28,7 @@ class SearchType extends AbstractType
                 'label' => 'Publication Date',
             ])
             ->add('submit', SubmitType::class, [
-                'label' => 'Search',
+                'label' => 'Rechercher',
             ]);
     }
 

@@ -87,7 +87,7 @@ class BookController extends AbstractController
 
         // Si l'utilisateur a renseigné une date de publication, on l'ajoute à la requête
         if ($filters['publication_date']) {
-            $query[] = 'publishedDate:' . $filters['publication_date']->format('Y');
+            $query[] = 'publishedDate:' . $filters['publication_date']->format('Y-M-D');
         }
 
         if (empty($query)) {
@@ -126,7 +126,6 @@ class BookController extends AbstractController
             // Effectuer la requête HTTP
             $response = $this->client->request('GET', $url);
             $data = $response->toArray();
-
             return $data['items'] ?? [];
         } catch (\Exception $e) {
             $this->logger->error('Google Books API error: ' . $e->getMessage());
