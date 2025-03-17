@@ -37,11 +37,17 @@ class DashboardController extends AbstractDashboardController
         // Option 3. You can render some custom template to display a proper dashboard with widgets, etc.
         // (tip: it's easier if your template extends from @EasyAdmin/page/content.html.twig)
         //
+        if (!$this->getUser()) {
+            return $this->redirectToRoute('app_login');
+        }
+
         return $this->render('admin/dashboard.html.twig');
     }
 
     public function configureDashboard(): Dashboard
     {
+
+
         return Dashboard::new()
             ->setTitle('BiblioTech');
     }
@@ -54,6 +60,6 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Emprunt', 'fas fa-hand', Borrowing::class);
         yield MenuItem::linkToCrud('Catégorie', 'fas fa-list', Category::class);
         yield MenuItem::section('<hr>');
-        yield MenuItem::linkToRoute('Retour au site', 'fas fa-arrow-left', 'todos_index');
+        yield MenuItem::linkToRoute('Retour au site', 'fas fa-arrow-left', 'app_homepage');
     }
 }
