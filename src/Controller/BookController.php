@@ -48,12 +48,10 @@ class BookController extends AbstractController
         ];
 
 
-        if ($request->headers->get('referer') == "https://127.0.0.1:8000/") {
+        if ($request->headers->get('referer') != "https://127.0.0.1:8000/books") {
             if (!empty($value)) {
-
                 $googleBooksResults = $this->searchGlobalGoogleBooks($value, $googleBooksApiKey);
             } else {
-
                 $googleBooksResults = $this->searchGlobalGoogleBooks("Harry Potter", $googleBooksApiKey);
             }
         } else {
