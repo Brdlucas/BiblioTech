@@ -29,7 +29,7 @@ final class PageController extends AbstractController
             return $this->redirectToRoute('app_homepage');
         }
 
-        $borrowings = $entityManager->getRepository(Borrowing::class)->findBy(['userbook' => $user->getId(), 'is_verified' => true]);
+        $borrowings = $entityManager->getRepository(Borrowing::class)->findBy(['userbook' => $user->getId()]);
 
         return $this->render('page/borrowing.html.twig', [
             'controller_name' => 'PageController',
