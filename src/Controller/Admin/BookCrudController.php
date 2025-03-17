@@ -24,6 +24,7 @@ class BookCrudController extends AbstractCrudController
         return [
             TextField::new('title', 'Titre'),
             TextField::new('content', 'Contenu'),
+            TextField::new('author', 'Auteur'),
             TextField::new('image', 'Image'),
             TextField::new('url', 'URL du PDF'),
             AssociationField::new('category', 'Catégorie')
