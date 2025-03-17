@@ -1,47 +1,45 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    {% if borrowings is not empty %}
-        <div class="container mx-auto p-6">
-            <h2 class="text-2xl font-bold mb-4 text-center">Livres Empruntés</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {% for borrowing in borrowings %}
-                    {% set book = borrowing.book %}
-                    <div class="bg-white shadow-md rounded-lg p-4">
-                        <img src="{{ book.image }}" alt="{{ book.title }}" class="w-full h-48 object-cover rounded-lg">
+	{% if borrowings is not empty %}
+		<div class="container mx-auto p-6">
+			<h2 class="text-2xl font-bold mb-4 text-center">Livres Empruntés</h2>
+			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+				{% for borrowing in borrowings %}
+					{% set book = borrowing.book %}
+					<div class="bg-white shadow-md rounded-lg p-4">
+						<img src="{{ book.image }}" alt="{{ book.title }}" class="w-full h-48 object-cover rounded-lg">
 
-                        <h3 class="text-lg font-semibold mt-2">{{ book.title }}</h3>
-                        <p class="text-gray-600 text-sm">Auteur :
-                            {{ book.author }}</p>
-                        <p class="text-gray-500 text-xs">Catégorie :
-                            {{ book.category.name }}</p>
+						<h3 class="text-lg font-semibold mt-2">{{ book.title }}</h3>
+						<p class="text-gray-600 text-sm">Auteur :
+							{{ book.author }}</p>
+						<p class="text-gray-500 text-xs">Catégorie :
+							{{ book.category.name }}</p>
 
-                        <p class="text-gray-400 text-xs mt-2">
-                            Emprunté le :
-                            {{ borrowing.empruntedAt|date('l d F Y à H:i') }}
-                        </p>
+						<p class="text-gray-400 text-xs mt-2">
+							Emprunté le :
+							{{ borrowing.empruntedAt|date('l d F Y à H:i') }}
+						</p>
 
-                        <p class="mt-2 text-sm text-gray-700">
-                            {{ book.content|slice(0, 100) }}...
-                        </p>
+						<p class="mt-2 text-sm text-gray-700">
+							{{ book.content|slice(0, 100) }}...
+						</p>
 
-                        <div class="mt-4 flex justify-between items-center">
-                            <a href="{{ book.url }}" target="_blank" class="text-blue-500 hover:underline">Voir plus</a>
-                            <span class="text-gray-500 text-xs">Retour prévu :
-                                {{ borrowing.renderedAt|date('d/m/Y') }}</span>
-                            
-                            <!-- Formulaire pour retirer l'emprunt -->
-                            <form action="{{ path('app_borrowing_id', {'id': borrowing.id}) }}" method="post" class="inline-block">
-                                <button type="submit" class="bg-red-500 text-white py-1 px-4 rounded-lg hover:bg-red-600">
-                                    Retourner le livre
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
-    {% else %}
-        <p class="text-center text-gray-500 mt-4">Aucun emprunt trouvé</p>
-    {% endif %}
+						<div class="mt-4 flex justify-between items-center">
+							<a href="{{ book.url }}" target="_blank" class="text-blue-500 hover:underline">Voir plus</a>
+							<span class="text-gray-500 text-xs">Retour prévu :
+								{{ borrowing.renderedAt|date('d/m/Y') }}</span>
+						</div>
+						<form action="{{ path('app_delete_borrowing_id', {'id': borrowing.id}) }}" method="post" class="inline-block">
+							<button type="submit" class="bg-red-500 text-white py-1 px-4 rounded-lg hover:bg-red-600">
+								Retourner le livre
+							</button>
+						</form>
+					</div>
+				{% endfor %}
+			</div>
+		</div>
+	{% else %}
+		<p class="text-center text-gray-500 mt-4">Aucun emprunt trouvé</p>
+	{% endif %}
 {% endblock %}
