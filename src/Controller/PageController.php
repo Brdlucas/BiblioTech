@@ -25,10 +25,23 @@ final class PageController extends AbstractController
 
         $borrowings = $entityManager->getRepository(Borrowing::class)->findBy(['userbook' => $user->getId(), 'is_verified' => true]);
 
-
         return $this->render('page/borrowing.html.twig', [
             'controller_name' => 'PageController',
             'borrowings' => $borrowings,
         ]);
+    }
+    #[Route('/borrowing/history/delete/{id}', name: 'app_delete_borrowing_id')]
+    public function deleteBorrowing(EntityManagerInterface $entityManager, string $id)
+    {
+        $user = $this->getUser();
+
+        $borrowing = $entityManager->getRepository(Borrowing::class)->find($id);
+
+        if ($borrowing) {
+            $entityManager->remove($borrowing);
+            $entityManager->flush();
+        }
+
+        return $this->redirectToRoute('app_borrowing_history');
     }
 }
