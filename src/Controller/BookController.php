@@ -57,7 +57,7 @@ class BookController extends AbstractController
         }
 
         // Recherche basée sur les filtres
-        if (!empty($filters['title'])) {
+        if (!empty($filters['title']) || !empty($filters['author'])) {
             // Si un titre est fourni (soit par le formulaire, soit par l'URL), on effectue la recherche
             $googleBooksResults = $this->searchGoogleBooks($filters, $googleBooksApiKey);
         } else {
