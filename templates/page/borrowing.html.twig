@@ -27,12 +27,14 @@
 						</p>
 
 						<div class="mt-4 flex justify-between items-center">
-							<a href="{{ book.url }}" target="_blank" class="text-blue-500 hover:underline">Voir plus</a>
+							<a href="{{ path('borrowing_pdf_view', { 'id': borrowing.id }) }}" target="_blank" class="btn btn-primary">
+								📄 Voir le rendu
+							</a>
 							<span class="text-gray-500 text-xs">Retour prévu :
 								{{ borrowing.renderedAt|date('d/m/Y') }}</span>
 						</div>
-						<form action="{{ path('app_delete_borrowing_id', {'id': borrowing.id}) }}" method="post" class="inline-block">
-							<button type="submit" class="bg-red-500 text-white py-1 px-4 rounded-lg hover:bg-red-600">
+						<form action="{{ path('app_delete_borrowing_id', {'id': borrowing.id}) }}" method="post" class="flex justify-self-end">
+							<button type="submit" class="bg-red-500 text-white py-1 px-4 rounded-lg hover:bg-red-600 ">
 								Retourner le livre
 							</button>
 						</form>
