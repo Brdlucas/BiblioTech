@@ -11,9 +11,13 @@
 		{% block stylesheets %}{% endblock %}
 	</head>
 	<body class="bg-gray-100 relative">
-		{% include 'components/search_form.html.twig' %}
+		{% if app.request.get('_route') != 'borrowing_pdf_view' %}
+
+			{% include 'components/search_form.html.twig' %}
+		{% endif %}
 
 		{% block body %}{% endblock %}
+
 		<div id="flash-container" class="absolute top-24 right-3 bg-red-500">
 			{% for message in app.flashes('success') %}
 				<div class="bg-green-500 text-white px-6 py-3 rounded shadow-md flex justify-between items-center">
