@@ -1,0 +1,48 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ book.title }}{% endblock %}
+
+{% block body %}
+{% if book is not empty %}
+    <div class="min-h-screen flex items-center justify-center bg-gray-50 px-6">
+        <div class="max-w-6xl w-full bg-white shadow-xl rounded-xl overflow-hidden lg:flex">
+            <div class="lg:w-1/3 w-full h-80 lg:h-auto flex items-center justify-center bg-gray-100 p-4">
+                {% if book.image is not empty %}
+                    <img src="{{ book.image }}" alt="{{ book.title }}" class="w-full h-full object-cover rounded-lg">
+                {% else %}
+                    <img src="/img/no-img.png" alt="{{ book.title }}" class="w-full h-full object-contain rounded-lg">
+                {% endif %}
+            </div>
+            <div class="lg:w-2/3 w-full p-6">
+                <h1 class="text-3xl font-bold text-[#63918b] mb-4 break-words">{{ book.title }}</h1>
+                
+                <p class="text-gray-700 text-sm mb-2"><strong>Auteur :</strong> 
+                    {{ book.author | default('Non disponible') }}
+                </p>
+                
+                <p class="text-gray-600 text-sm"><strong>Publié le :</strong> 
+                    {{ book.publishedAt is not empty ? book.publishedAt|date('d/m/Y') : 'Non disponible' }}
+                </p>
+
+                <p class="text-gray-600 text-sm"><strong>Catégorie :</strong> 
+                    {{ book.category.name | default('Non disponible') }}
+                </p>
+
+                <p class="text-gray-700 text-sm mb-4"><strong>Description :</strong><br> 
+                    {{ book.content | default('Aucune description disponible') }}
+                </p>
+                <div class="flex items-center space-x-4 mt-4">
+                    <form action="{{ path('app_borrowing_id', { 'id': book.id, 'isFromBdd': book.isFromBdd ?? false }) }}" method="post">
+                        <button type="submit" class="px-6 py-2 bg-[#63918b] text-white font-semibold rounded-lg shadow-md hover:bg-[#4f7d74] transition duration-300">
+                            Emprunter
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% else %}
+    <p class="text-center text-gray-500 mt-8">Ce livre n'est pas disponible.</p>
+{% endif %}
+{% endblock %}
