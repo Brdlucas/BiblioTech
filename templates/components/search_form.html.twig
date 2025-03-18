@@ -23,8 +23,8 @@
 			<div class="hidden md:flex space-x-6">
 				<a href="{{ path('app_books') }}" class="text-[#63918b] font-bold text-lg hover:text-[#4f746e] transition duration-200">LIVRES</a>
 				{% if app.user %}
-					<a href="{{ path('app_borrowing_history') }}" class="text-[#63918b] font-bold text-lg hover:text-[#4f746e] transition duration-200">Emprunts</a>
-					<a href="{{ path('app_logout') }}" class="text-[#63918b] font-bold text-lg hover:text-[#4f746e] transition duration-200">Déconnexion</a>
+					<a href="{{ path('app_borrowing_history') }}" class="text-[#63918b] font-bold text-lg hover:text-[#4f746e] transition duration-200">EMPRUNTS</a>
+					<a href="{{ path('app_logout') }}" class="text-[#63918b] font-bold text-lg hover:text-[#4f746e] transition duration-200">DECONNEXION</a>
 				{% else %}
 					<a href="{{ path('app_register') }}" class="text-[#63918b] font-bold text-lg hover:text-[#4f746e] transition duration-200">INSCRIPTION</a>
 					<a href="{{ path('app_login') }}" class="text-[#63918b] font-bold text-lg hover:text-[#4f746e] transition duration-200">CONNEXION</a>
