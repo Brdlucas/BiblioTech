@@ -171,10 +171,16 @@ class BookController extends AbstractController
         $user = $this->getUser();
         $borrowings = $entityManager->getRepository(Borrowing::class)->findBy(['userbook' => $user->getId()]);
 
-        if (count($borrowings) > 5) {
-            $this->addFlash('danger', 'Vous avez déjà emprunté 5 livres.');
+        // Filtrer uniquement les emprunts avec le statut "approved" ou "waiting"
+        $validBorrowings = array_filter($borrowings, function ($borrowing) {
+            return in_array($borrowing->getStatus(), ['approved', 'waiting']); // Vérifie les deux statuts
+        });
+
+        if (count($validBorrowings) >= 5) {
+            $this->addFlash('danger', 'Vous avez déjà emprunté 5 livres (approuvés ou en attente).');
             return $this->redirectToRoute('app_books');
         }
+
 
         // Récupération des informations du livre via l'API Google Books
         $googleBooksApiKey = $this->getParameter('google_books_api_key');
