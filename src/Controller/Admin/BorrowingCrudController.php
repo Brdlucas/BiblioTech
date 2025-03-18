@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Borrowing;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,9 +33,11 @@ class BorrowingCrudController extends AbstractCrudController
             AssociationField::new('book')  // Affiche la relation avec Book
                 ->setFormTypeOption('choice_label', 'title') // Affiche le titre du livre dans le formulaire
                 ->setLabel('Titre du livre')
-                ->setCrudController(BookCrudController::class), // Lié à la gestion des livres
+                ->setCrudController(BookCrudController::class) // Lié à la gestion des livres
+                ->setFormTypeOption('disabled', true), // Désactive l'édition
             AssociationField::new('userbook')  // Affiche la relation avec Book
-                ->setFormTypeOption('choice_label', 'email') // Affiche l'email de l'utilisateur dans le formulaire
+                ->setFormTypeOption('choice_label', 'email') // Désactive l'édition
+                ->setFormTypeOption('disabled', true) // Désactive l'édition
                 ->setLabel('Email de l\'utilisateur')
                 ->setCrudController(UserCrudController::class), // Lié à la gestion des utilisateurs
             ChoiceField::new('status', 'Statut')
@@ -44,7 +47,10 @@ class BorrowingCrudController extends AbstractCrudController
                     'Refusé' => 'refused',
                     'Retourné' => 'returned',
                 ]),
-            DateField::new('emprunted_at', 'Emprunté le'),
+            DateField::new('emprunted_at', 'Date de création')
+                ->setFormTypeOption('disabled', true) // Désactive l'édition
+                ->onlyOnIndex() // Affiche dans la liste
+                ->setSortable(true), // Permet le tri par date
             DateField::new('rendered_at', 'A Rendre le'),
         ];
     }
@@ -88,7 +94,7 @@ class BorrowingCrudController extends AbstractCrudController
         }
 
         // Modifier le statut de l'emprunt
-        $borrowing->setStatus('approved');  // Remplacer 'approve' par 'approved'
+        $borrowing->setStatus('approved');
         $entityManager->persist($borrowing);
         $entityManager->flush();
 
