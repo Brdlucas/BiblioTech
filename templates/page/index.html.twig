@@ -1,6 +1,37 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Bienvenue sur BiblioTech !
-{% endblock %}
+{% block body %}
+    <!-- Section d'introduction avec cards -->
+    <section class="py-16 bg-white text-gray-900">
+        <div class="container mx-auto px-6 text-center">
+            <h1 class="text-4xl font-extrabold mb-12 text-blue-600">Bienvenue dans BiblioTech</h1>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12">
+                <!-- Card 1: Nombre d'utilisateurs -->
+                <div class="bg-white text-blue-600 p-8 rounded-xl shadow-xl transform hover:scale-105 transition duration-300">
+                    <div class="flex items-center mb-6">
+                        <!-- Icone utilisateurs -->
+                        <i class="fas fa-users text-4xl mr-4"></i>
+                        <h2 class="text-3xl font-semibold">Rejoignez nos 1200 utilisateurs</h2> <!-- Dynamique -->
+                    </div>
+                    <p class="text-lg mb-6">BiblioTech est une plateforme utilisée par des milliers de lecteurs. Rejoignez la communauté de passionnés et explorez nos ressources.</p>
+                    <a href="{{ path('app_register') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-full text-lg font-semibold transition duration-300 transform hover:scale-105">Commencer maintenant</a>
+                </div>
 
-{% block body %}{% endblock %}
+                <!-- Card 2 -->
+                <div class="bg-white text-blue-600 p-8 rounded-xl shadow-xl transform hover:scale-105 transition duration-300">
+                    <h2 class="text-3xl font-semibold mb-6">À propos de BiblioTech</h2>
+                    <p class="text-lg mb-6">BiblioTech est une bibliothèque numérique moderne, avec une collection variée de livres que vous pouvez emprunter à tout moment.</p>
+                    <p class="text-lg mb-6">Nos livres sont accessibles immédiatement après l'emprunt. Découvrez des mondes fascinants avec juste un clic.</p>
+                    <a href="{{ path('app_books') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-full text-lg font-semibold transition duration-300 transform hover:scale-105">Voir tous les livres</a>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="bg-white text-blue-600 p-8 rounded-xl shadow-xl transform hover:scale-105 transition duration-300">
+                    <h2 class="text-3xl font-semibold mb-6">Rejoignez-nous maintenant !</h2>
+                    <p class="text-lg mb-6">Inscrivez-vous pour commencer à emprunter des livres, suivre vos lectures, et obtenir des recommandations personnalisées.</p>
+                    <a href="{{ path('app_register') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-full text-lg font-semibold transition duration-300 transform hover:scale-105">Commencer maintenant</a>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
