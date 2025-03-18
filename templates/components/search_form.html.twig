@@ -1,36 +1,60 @@
 {% block body %}
-	<div
-		class="bg-indigo-600 shadow-md">
+	<div class="bg-white shadow-md">
 		<!-- Navbar -->
-		<nav
-			class="max-w-8xl mx-auto px-4 py-4 flex items-center justify-between">
+		<nav class="max-w-8xl mx-auto px-4 py-4 flex items-center justify-between">
 			<!-- Logo ou nom de site (page d'accueil à gauche) -->
-			<a href="{{ path('app_homepage') }}" class="text-white text-2xl font-semibold hover:text-indigo-200 transition duration-200">
+			<img src="/img/bibliotech.png" alt="BibliOtech Logo" style="max-width: 150px; height: auto;">
+
+			<a href="{{ path('app_homepage') }}" class="text-[#63918b] text-2xl font-semibold hover:text-[#4f746e] transition duration-200">
 				BiblioTech
 			</a>
 
 			<!-- Barre de recherche au centre -->
 			<div class="flex-grow flex justify-center">
-				<form action="{{ path('app_books') }}" method="get" class="flex items-center space-x-4 w-full max-w-4xl">
-					<input type="text" name="value" placeholder="Rechercher un livre..." class="px-4 py-2 rounded-lg bg-white border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 w-full"/>
-					<button type="submit" class="p-3 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-400 hover:to-indigo-400 text-white font-semibold rounded-full shadow-md transition-transform transform hover:scale-[1.05] duration-[300ms]">
+				<form action="{{ path('app_books') }}" method="get" class="flex items-center space-x-4 w-full max-w-2xl">
+					<input type="text" name="value" placeholder="Rechercher un livre..." class="px-4 py-2 rounded-lg bg-[#63918b] border border-gray-300 focus:ring-[#4f746e] focus:border-[#4f746e] w-3/4 text-white placeholder-white"/>
+					<button type="submit" class="p-3 bg-[#63918b] hover:bg-[#4f746e] text-white font-semibold rounded-full shadow-md transition-transform transform hover:scale-[1.05] duration-[300ms]">
 						Rechercher
 					</button>
 				</form>
 			</div>
 
-			<!-- Boutons de navigation à droite -->
+			<!-- Boutons de navigation -->
 			<div class="hidden md:flex space-x-6">
-				<a href="{{ path('app_books') }}" class="text-white hover:text-indigo-200 transition duration-200">Livres</a>
+				<a href="{{ path('app_books') }}" class="text-[#63918b] font-bold text-lg hover:text-[#4f746e] transition duration-200">LIVRES</a>
 				{% if app.user %}
-					<a href="{{ path('app_borrowing_history') }}" class="text-white hover:text-indigo-200 transition duration-200">Emprunts</a>
-					<a href="{{ path('app_logout') }}" class="text-white hover:text-indigo-200 transition duration-200">Déconnexion</a>
+					<a href="{{ path('app_borrowing_history') }}" class="text-[#63918b] font-bold text-lg hover:text-[#4f746e] transition duration-200">Emprunts</a>
+					<a href="{{ path('app_logout') }}" class="text-[#63918b] font-bold text-lg hover:text-[#4f746e] transition duration-200">Déconnexion</a>
 				{% else %}
-					<a href="{{ path('app_register') }}" class="text-white hover:text-indigo-200 transition duration-200">Inscription</a>
-					<a href="{{ path('app_login') }}" class="text-white hover:text-indigo-200 transition duration-200">Connexion</a>
+					<a href="{{ path('app_register') }}" class="text-[#63918b] font-bold text-lg hover:text-[#4f746e] transition duration-200">INSCRIPTION</a>
+					<a href="{{ path('app_login') }}" class="text-[#63918b] font-bold text-lg hover:text-[#4f746e] transition duration-200">CONNEXION</a>
 				{% endif %}
 			</div>
+
+			<!-- Menu mobile -->
+			<div class="md:hidden">
+				<button id="menu-toggle" class="text-[#63918b] focus:outline-none">
+					&#9776;
+				</button>
+			</div>
 		</nav>
+
+		<!-- Menu déroulant mobile -->
+		<div id="mobile-menu" class="hidden md:hidden flex flex-col items-center bg-white shadow-md p-4 space-y-4">
+			<a href="{{ path('app_books') }}" class="text-[#63918b] font-bold text-lg hover:text-[#4f746e] transition duration-200">Livres</a>
+			{% if app.user %}
+				<a href="{{ path('app_borrowing_history') }}" class="text-[#63918b] font-bold text-lg hover:text-[#4f746e] transition duration-200">Emprunts</a>
+				<a href="{{ path('app_logout') }}" class="text-[#63918b] font-bold text-lg hover:text-[#4f746e] transition duration-200">Déconnexion</a>
+			{% else %}
+				<a href="{{ path('app_register') }}" class="text-[#63918b] font-bold text-lg hover:text-[#4f746e] transition duration-200">Inscription</a>
+				<a href="{{ path('app_login') }}" class="text-[#63918b] font-bold text-lg hover:text-[#4f746e] transition duration-200">Connexion</a>
+			{% endif %}
+		</div>
 	</div>
 
+	<script>
+		document.getElementById('menu-toggle').addEventListener('click', function () {
+			document.getElementById('mobile-menu').classList.toggle('hidden');
+		});
+	</script>
 {% endblock %}
