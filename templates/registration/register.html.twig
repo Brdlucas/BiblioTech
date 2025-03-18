@@ -1,19 +1,17 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Register
-{% endblock %}
+{% block title %}Inscription{% endblock %}
 
 {% block body %}
-	<div class="py-12">
-		<div class="max-w-4xl mx-auto px-6 bg-white p-8 rounded-lg shadow-lg">
+	<div class="py-4 flex justify-center items-center min-h-[80vh] bg-gray-100">
+		<div class="max-w-lg w-full px-8 py-10 bg-white rounded-2xl shadow-xl">
+			<h1 class="text-3xl font-bold text-center text-[#63918b] mb-6">Inscription</h1>
 
 			{% for flash_error in app.flashes('verify_email_error') %}
-				<div class="alert alert-danger mb-4 p-4 bg-red-100 text-red-700 border border-red-300 rounded">
+				<div class="mb-4 p-4 bg-red-100 text-red-700 border border-red-300 rounded-lg">
 					{{ flash_error }}
 				</div>
 			{% endfor %}
-
-			<h1 class="text-3xl font-semibold text-center text-gray-800 mb-6">Inscription</h1>
 
 			{{ form_errors(registrationForm) }}
 
@@ -24,7 +22,7 @@
 				<div class="mt-2">
 					{{ form_widget(registrationForm.email, {
                     'attr': {
-                        'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500'
+                        'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#63918b] focus:border-[#63918b]'
                     }
                 }) }}
 				</div>
@@ -35,7 +33,7 @@
 				<div class="mt-2">
 					{{ form_widget(registrationForm.firstname, {
                     'attr': {
-                        'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500'
+                        'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#63918b] focus:border-[#63918b]'
                     }
                 }) }}
 				</div>
@@ -46,7 +44,7 @@
 				<div class="mt-2">
 					{{ form_widget(registrationForm.lastname, {
                     'attr': {
-                        'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500'
+                        'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#63918b] focus:border-[#63918b]'
                     }
                 }) }}
 				</div>
@@ -57,7 +55,7 @@
 				<div class="mt-2">
 					{{ form_widget(registrationForm.plainPassword, {
                     'attr': {
-                        'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500'
+                        'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#63918b] focus:border-[#63918b]'
                     }
                 }) }}
 				</div>
@@ -67,18 +65,18 @@
 				<div class="flex items-center">
 					{{ form_widget(registrationForm.agreeTerms, {
                     'attr': {
-                        'class': 'h-4 w-4 text-indigo-500 focus:ring-indigo-500'
+                        'class': 'h-4 w-4 text-[#63918b] focus:ring-[#63918b]'
                     }
                 }) }}
 				</div>
 				<label for="agreeTerms" class="ml-2 text-sm text-gray-600">
 					J'accepte
-					<a href="#" class="text-indigo-500 hover:text-indigo-700"> les termes et conditions</a>
+					<a href="#" class="text-[#63918b] hover:text-[#4f746e]"> les termes et conditions</a>
 				</label>
 			</div>
 
 			<div class="flex justify-center mb-6">
-				<button type="submit" class="w-full py-2 bg-indigo-500 hover:bg-indigo-600 text-white font-semibold rounded-lg shadow-md transition-transform transform hover:scale-105 duration-300">
+				<button type="submit" class="w-40 py-2 bg-[#63918b] hover:bg-[#4f746e] text-white font-semibold rounded-lg shadow-md transition-transform transform hover:scale-105 duration-300">
 					S'inscrire
 				</button>
 			</div>

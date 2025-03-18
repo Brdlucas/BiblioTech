@@ -295,7 +295,7 @@ class BookController extends AbstractController
         $entityManager->persist($borrowing);
         $entityManager->flush();
 
-        $this->addFlash('success', "Votre emprunt a bien été enregistré et soumis à l'autosisation de l'administrateur !");
+        $this->addFlash('success', "Votre emprunt a bien été enregistré et soumis à l'autorisation de l'administrateur !");
 
         return $this->render('books/book.html.twig', [
             'book' => $googleBookIdResult ?? [], // Résultats de l'API
