@@ -26,12 +26,12 @@ class BookController extends AbstractController
         $this->logger = $logger;
     }
     #[Route('/books', name: 'app_books', methods: ['GET', 'POST'])]
-    public function index(Request $request)
+    public function index(Request $request, EntityManagerInterface $entityManager)
     {
-        // Récupération de la valeur dans l'URL
+        // Récupérer la valeur dans l'URL
         $value = $request->query->get('value');
 
-        // Récupération de la clé API dans la méthode, pas dans le constructeur
+        // Récupérer la clé API dans la méthode, pas dans le constructeur
         $googleBooksApiKey = $this->getParameter('google_books_api_key');
 
         // Valeurs par défaut pour les filtres
@@ -56,21 +56,59 @@ class BookController extends AbstractController
             $filters = $defaultFilters;
         }
 
-        // Recherche basée sur les filtres
+        // Recherche dans la base de données
+        $queryBuilder = $entityManager->getRepository(Book::class)->createQueryBuilder('b');
+
+        // Appliquer les filtres de recherche sur le titre et l'auteur
+        if (!empty($filters['title'])) {
+            $queryBuilder->andWhere('b.title LIKE :title')
+                ->setParameter('title', '%' . $filters['title'] . '%');
+        }
+
+        if (!empty($filters['author'])) {
+            $queryBuilder->andWhere('b.author LIKE :author')
+                ->setParameter('author', '%' . $filters['author'] . '%');
+        }
+
+        // Exécuter la recherche et obtenir les résultats de la BDD
+        $booksFromBdd = $queryBuilder->getQuery()->getResult();
+
+        // Recherche via Google Books API si des critères sont remplis
+        $googleBooksResults = [];
         if (!empty($filters['title']) || !empty($filters['author'])) {
-            // Si un titre est fourni (soit par le formulaire, soit par l'URL), on effectue la recherche
             $googleBooksResults = $this->searchGoogleBooks($filters, $googleBooksApiKey);
         } else {
-            // Si aucun titre n'est spécifié, recherche une valeur par défaut
             $googleBooksResults = $this->searchGoogleBooks(['title' => 'Harry Potter'], $googleBooksApiKey);
         }
 
-        // Retourne la vue avec les résultats et le formulaire
+        // Extraire les IDs Google des résultats de l'API pour éviter les doublons
+        $googleBookIds = [];
+        foreach ($googleBooksResults as $googleBook) {
+            if (isset($googleBook['id'])) {
+                $googleBookIds[] = $googleBook['id'];
+            }
+        }
+
+        // Filtrer les livres de la BDD pour ne pas inclure les doublons avec l'API
+        $uniqueBddBooks = [];
+        foreach ($booksFromBdd as $bookFromBdd) {
+            $googleId = $bookFromBdd->getGoogleId();
+            if (!$googleId || !in_array($googleId, $googleBookIds)) {
+                $uniqueBddBooks[] = $bookFromBdd;
+            }
+        }
+
+        // Combiner les livres uniques de la BDD et tous ceux de l'API
+        $finalBooks = array_merge($googleBooksResults, $uniqueBddBooks);
+
+        // Retourner la vue avec les résultats et le formulaire
         return $this->render('books/index.html.twig', [
             'form' => $form->createView(),
-            'results' => $googleBooksResults ?? [],
+            'results' => $finalBooks,
         ]);
     }
+
+
 
 
 
@@ -94,7 +132,7 @@ class BookController extends AbstractController
 
         // Construire l'URL de la requête
         $queryStr = implode('+', $query);
-        $url = 'https://www.googleapis.com/books/v1/volumes?q=' . $queryStr . '&maxResults=3&key=' . $googleBooksApiKey;
+        $url = 'https://www.googleapis.com/books/v1/volumes?q=' . $queryStr . '&maxResults=7&key=' . $googleBooksApiKey;
 
         try {
             $response = $this->client->request('GET', $url);
@@ -148,6 +186,10 @@ class BookController extends AbstractController
     }
 
 
+
+
+
+
     #[Route('/book/{id}', name: 'app_book_id', methods: ['GET'])]
     public function book(Request $request, string $id): Response
     {
@@ -159,6 +201,10 @@ class BookController extends AbstractController
             'book' => $googleBookIdResult ?? [], // Résultats de l'API
         ]);
     }
+
+
+
+
 
     #[Route('/borrowing/{id}', name: 'app_borrowing_id', methods: ['POST'])]
     public function borrowing(Request $request, string $id, EntityManagerInterface $entityManager): Response
@@ -201,7 +247,7 @@ class BookController extends AbstractController
         // Récupération des données du livre ou création du livre
         $title = $bookInt['title'] ?? 'Aucun titre';
         $author = $bookInt['authors'][0] ?? 'Aucun auteur';
-        $image = $bookInt['imageLinks']['smallThumbnail'] ?? "/img/no-img.png";
+        $image = $bookInt['imageLinks']['thumbnail'] ?? "/img/no-img.png";
         $url = $bookInt['infoLink'] ?? "aucun lien";
         $content = $bookInt['description'] ?? 'Aucune description disponible';
         $publishedDate = $bookInt['publishedDate'] ?? '1970-01-01'; // Par défaut une vieille date
@@ -217,6 +263,9 @@ class BookController extends AbstractController
             $book->setContent($content);
             $book->setPublishedAt(new \DateTime($publishedDate));
             $book->setCreatedAt(new \DateTime());
+            $book->setGoogleId($id ?? null);
+            $book->setIsFromBdd(true);
+
 
             $entityManager->persist($book);
             $entityManager->flush();

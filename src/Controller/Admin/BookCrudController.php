@@ -3,13 +3,15 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Book;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\Event\LifecycleEventArgs;
+use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
-use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 
 class BookCrudController extends AbstractCrudController
 {
@@ -18,6 +20,13 @@ class BookCrudController extends AbstractCrudController
         return Book::class;
     }
 
+    public function createEntity(string $entityFqcn)
+    {
+        $book = new Book();
+        $book->setIsFromBdd(true);  // Définir isFromBdd à true lors de la création
+
+        return $book;
+    }
 
     public function configureFields(string $pageName): iterable
     {
