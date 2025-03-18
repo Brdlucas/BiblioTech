@@ -26,7 +26,7 @@ class BookController extends AbstractController
         $this->logger = $logger;
     }
     #[Route('/books', name: 'app_books', methods: ['GET', 'POST'])]
-    public function index(Request $request)
+    public function index(Request $request, EntityManagerInterface $entityManager)
     {
         // Récupération de la valeur dans l'URL
         $value = $request->query->get('value');
@@ -36,7 +36,7 @@ class BookController extends AbstractController
 
         // Valeurs par défaut pour les filtres
         $defaultFilters = [
-            'title' => $value ?? '', // Utilise la valeur de l'URL ou une chaîne vide si rien n'est passé
+            'title' => $value ?? '',
             'author' => null,
         ];
 
@@ -46,31 +46,74 @@ class BookController extends AbstractController
 
         // Vérifier si le formulaire a été soumis et est valide
         if ($form->isSubmitted() && $form->isValid()) {
-            // Si le formulaire est valide, on récupère les données du formulaire
             $filters = [
                 'title' => $form->get('title')->getData() ?? $defaultFilters['title'],
                 'author' => $form->get('author')->getData() ?? $defaultFilters['author'],
             ];
         } else {
-            // Si le formulaire n'est pas soumis ou pas valide, on utilise les filtres par défaut
             $filters = $defaultFilters;
         }
 
-        // Recherche basée sur les filtres
+        // Recherche des livres depuis l'API Google Books
         if (!empty($filters['title']) || !empty($filters['author'])) {
-            // Si un titre est fourni (soit par le formulaire, soit par l'URL), on effectue la recherche
             $googleBooksResults = $this->searchGoogleBooks($filters, $googleBooksApiKey);
         } else {
-            // Si aucun titre n'est spécifié, recherche une valeur par défaut
             $googleBooksResults = $this->searchGoogleBooks(['title' => 'Harry Potter'], $googleBooksApiKey);
+        }
+
+        // Récupérer les livres en base de données
+        $queryBuilder = $entityManager->getRepository(Book::class)->createQueryBuilder('b')
+            ->where('b.isFromBdd = true OR b.googleId IS NULL');
+
+        // Exclure les doublons en BDD si une version API existe
+        $queryBuilder->andWhere(
+            $queryBuilder->expr()->notIn(
+                'b.googleId',
+                $entityManager->getRepository(Book::class)
+                    ->createQueryBuilder('bb')
+                    ->select('bb.googleId')
+                    ->where('bb.isFromBdd = false') // On garde les livres de l'API
+                    ->getDQL()
+            )
+        );
+
+        // Appliquer les filtres de recherche sur la BDD
+        if (!empty($filters['title'])) {
+            $queryBuilder->andWhere('b.title LIKE :title')
+                ->setParameter('title', '%' . $filters['title'] . '%');
+        }
+        if (!empty($filters['author'])) {
+            $queryBuilder->andWhere('b.author LIKE :author')
+                ->setParameter('author', '%' . $filters['author'] . '%');
+        }
+
+        $booksFromDatabase = $queryBuilder->getQuery()->getResult();
+
+        // Fusionner les résultats API et BDD (en priorisant l'API)
+        $booksByGoogleId = [];
+        $filteredBooks = [];
+
+        foreach ($googleBooksResults as $book) {
+            if (!empty($book['googleId'])) {
+                $booksByGoogleId[$book['googleId']] = $book;
+            }
+            $filteredBooks[] = $book;
+        }
+
+        foreach ($booksFromDatabase as $book) {
+            $googleId = $book->getGoogleId();
+            if (!$googleId || !isset($booksByGoogleId[$googleId])) {
+                $filteredBooks[] = $book; // Ajouter en BDD si pas en API
+            }
         }
 
         // Retourne la vue avec les résultats et le formulaire
         return $this->render('books/index.html.twig', [
             'form' => $form->createView(),
-            'results' => $googleBooksResults ?? [],
+            'results' => $filteredBooks,
         ]);
     }
+
 
 
 
@@ -171,10 +214,16 @@ class BookController extends AbstractController
         $user = $this->getUser();
         $borrowings = $entityManager->getRepository(Borrowing::class)->findBy(['userbook' => $user->getId()]);
 
-        if (count($borrowings) > 5) {
-            $this->addFlash('danger', 'Vous avez déjà emprunté 5 livres.');
+        // Filtrer uniquement les emprunts avec le statut "approved" ou "waiting"
+        $validBorrowings = array_filter($borrowings, function ($borrowing) {
+            return in_array($borrowing->getStatus(), ['approved', 'waiting']); // Vérifie les deux statuts
+        });
+
+        if (count($validBorrowings) >= 5) {
+            $this->addFlash('danger', 'Vous avez déjà emprunté 5 livres (approuvés ou en attente).');
             return $this->redirectToRoute('app_books');
         }
+
 
         // Récupération des informations du livre via l'API Google Books
         $googleBooksApiKey = $this->getParameter('google_books_api_key');
