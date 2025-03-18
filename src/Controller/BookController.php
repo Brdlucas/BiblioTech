@@ -191,15 +191,24 @@ class BookController extends AbstractController
 
 
     #[Route('/book/{id}', name: 'app_book_id', methods: ['GET'])]
-    public function book(Request $request, string $id): Response
+    public function book(Request $request, string $id, EntityManagerInterface $entityManager): Response
     {
-        $googleBooksApiKey = $this->getParameter('google_books_api_key');
+        $isFromBDD = $request->query->get('isFromBdd');
 
-        $googleBookIdResult = $this->getBookDetail($id, $googleBooksApiKey);
+        if ($isFromBDD) {
+            $book = $entityManager->getRepository(Book::class)->findOneBy(['id' => $id]);
+            return $this->render('books/book-bdd.html.twig', [
+                'book' => $book ?? [],
+            ]);
+        } else {
+            $googleBooksApiKey = $this->getParameter('google_books_api_key');
 
-        return $this->render('books/book.html.twig', [
-            'book' => $googleBookIdResult ?? [], // Résultats de l'API
-        ]);
+            $googleBookIdResult = $this->getBookDetail($id, $googleBooksApiKey);
+
+            return $this->render('books/book-api.html.twig', [
+                'book' => $googleBookIdResult ?? [], // Résultats de l'API
+            ]);
+        }
     }
 
 
@@ -213,9 +222,13 @@ class BookController extends AbstractController
             return $this->redirectToRoute('app_login');
         }
 
-        // Vérification du nombre d'emprunts
+
+
+        $isFromBdd = $request->query->get('isFromBdd');
+
         $user = $this->getUser();
         $borrowings = $entityManager->getRepository(Borrowing::class)->findBy(['userbook' => $user->getId()]);
+
 
         // Filtrer uniquement les emprunts avec le statut "approved" ou "waiting"
         $validBorrowings = array_filter($borrowings, function ($borrowing) {
@@ -226,6 +239,45 @@ class BookController extends AbstractController
             $this->addFlash('danger', 'Vous avez déjà emprunté 5 livres (approuvés ou en attente).');
             return $this->redirectToRoute('app_books');
         }
+
+        if ($isFromBdd) {
+            // Récupérer le livre à partir de l'ID
+            $book = $entityManager->getRepository(Book::class)->findOneBy(['id' => $id]);
+
+            if (!$book) {
+                // Si le livre n'est pas trouvé, lancer une exception ou afficher un message d'erreur
+                throw $this->createNotFoundException('Livre non trouvé');
+            }
+
+            // Vérifier si un emprunt existe déjà pour ce livre et cet utilisateur
+            $existingBorrowing = $entityManager->getRepository(Borrowing::class)->findOneBy([
+                'book' => $book,
+                'userbook' => $user,
+            ]);
+
+            if ($existingBorrowing) {
+                // Si l'emprunt existe déjà, afficher un message ou rediriger
+                $this->addFlash('warning', 'Vous avez déjà emprunté ce livre.');
+                return $this->render('books/book-api.html.twig', [
+                    'book' => $book, // Résultats de l'API
+                ]);
+            }
+
+            $newBorrowing = new Borrowing();
+            $newBorrowing->setBook($book);
+            $newBorrowing->setUserbook($user);
+            $newBorrowing->setEmpruntedAt(new \DateTimeImmutable());
+            $newBorrowing->setRenderedAt(new \DateTimeImmutable('+10 days'));
+            $newBorrowing->setStatus('waiting');
+
+            $entityManager->persist($newBorrowing);
+            $entityManager->flush();
+
+            return $this->render('books/book-bdd.html.twig', [
+                'book' => $book,
+            ]);
+        }
+
 
 
         // Récupération des informations du livre via l'API Google Books
@@ -297,7 +349,7 @@ class BookController extends AbstractController
 
         $this->addFlash('success', "Votre emprunt a bien été enregistré et soumis à l'autorisation de l'administrateur !");
 
-        return $this->render('books/book.html.twig', [
+        return $this->render('books/book-api.html.twig', [
             'book' => $googleBookIdResult ?? [], // Résultats de l'API
         ]);
     }
