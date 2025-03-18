@@ -47,6 +47,12 @@ class Book
     #[ORM\Column(length: 80)]
     private ?string $author = null;
 
+    #[ORM\Column]
+    private ?bool $isFromBdd = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $googleId = null;
+
 
     public function __construct()
     {
@@ -180,6 +186,30 @@ class Book
     public function setAuthor(string $author): static
     {
         $this->author = $author;
+
+        return $this;
+    }
+
+    public function isFromBdd(): ?bool
+    {
+        return $this->isFromBdd;
+    }
+
+    public function setIsFromBdd(bool $isFromBdd): static
+    {
+        $this->isFromBdd = $isFromBdd;
+
+        return $this;
+    }
+
+    public function getGoogleId(): ?string
+    {
+        return $this->googleId;
+    }
+
+    public function setGoogleId(?string $googleId): static
+    {
+        $this->googleId = $googleId;
 
         return $this;
     }
