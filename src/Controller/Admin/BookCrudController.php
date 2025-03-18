@@ -70,7 +70,7 @@ class BookCrudController extends AbstractCrudController
             TextField::new('content', 'Contenu'),
             TextField::new('author', 'Auteur'),
             TextField::new('image', 'Image'),
-            TextField::new('url', 'URL du PDF'),
+            TextField::new('url', 'Url'),
             AssociationField::new('category', 'Catégorie')
                 ->setCrudController(CategoryCrudController::class) // Lien vers le gestionnaire de catégories
                 ->setRequired(true), // Facultatif : rendre le champ obligatoire pour un livre
