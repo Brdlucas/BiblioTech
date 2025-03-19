@@ -31,7 +31,7 @@ class Category
 
     public function __tostring()
     {
-        return $this->name;
+        return $this->name ?? 'Aucune catégorie';
     }
 
     public function getId(): ?int
