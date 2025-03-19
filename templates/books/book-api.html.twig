@@ -1,0 +1,48 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ book.volumeInfo.title }}{% endblock %}
+{% block body %}
+{% if book is not empty %}
+    <div class="min-h-screen flex items-center justify-center bg-gray-50 px-6">
+        <div class="max-w-6xl w-full bg-white shadow-xl rounded-xl overflow-hidden lg:flex">
+            <div class="lg:w-1/3 w-full h-80 lg:h-auto flex items-center justify-center bg-gray-100 p-4">
+                {% if book.volumeInfo.imageLinks is defined and book.volumeInfo.imageLinks.extraLarge is defined %}
+                    <img src="{{ book.volumeInfo.imageLinks.extraLarge }}" alt="{{ book.volumeInfo.title }}" class="w-full h-full object-cover rounded-lg">
+                {% else %}
+                    <img src="/img/no-img.png" alt="{{ book.volumeInfo.title }}" class="w-full h-full object-contain rounded-lg">
+                {% endif %}
+            </div>
+
+            <div class="lg:w-2/3 w-full p-6">
+                <h1 class="text-3xl font-bold text-[#63918b] mb-4 break-words">{{ book.volumeInfo.title }}</h1>
+                
+                <p class="text-gray-700 text-sm mb-2"><strong>Auteur(s) :</strong> 
+                    {% if book.volumeInfo.authors is defined and book.volumeInfo.authors is not empty %}
+                        {{ book.volumeInfo.authors|join(', ') }}
+                    {% else %}Non disponible{% endif %}
+                </p>
+                
+                <p class="text-gray-600 text-sm"><strong>Publié le :</strong> {{ book.volumeInfo.publishedDate }}</p>
+                <p class="text-gray-600 text-sm"><strong>Editeur :</strong> {{ book.volumeInfo.publisher }}</p>
+                <p class="text-gray-600 text-sm mb-4"><strong>Catégorie :</strong> 
+                    {{ book.volumeInfo.categories[0] | default('Non disponible') }}</p>
+                
+                <p class="text-gray-700 text-sm mb-4">{{ book.volumeInfo.description | default('Aucune description disponible') }}</p>
+                
+                <div class="flex items-center space-x-4 mt-4">
+                    <form action="{{ path('app_borrowing_id', { 'id': book.id }) }}" method="post">
+                        <button type="submit" class="px-6 py-2 bg-[#63918b] text-white font-semibold rounded-lg shadow-md hover:bg-[#4f7d74] transition duration-300">
+                            Emprunter
+                        </button>
+                    </form>
+                    
+                    <a href="{{ book.volumeInfo.infoLink }}" target="_blank" class="px-6 py-2 bg-gray-700 text-white font-semibold rounded-lg shadow-md hover:bg-gray-800 transition duration-300">
+                        Voir le résumé
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% else %}
+    <p class="text-center text-gray-500 mt-8">Ce livre n'est pas disponible.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+{% block title %}Emprunts - Mes Livres{% endblock %}
+
+{% block body %}
+	{% if borrowings is not empty %}
+		<div class="container mx-auto p-6">
+			<h2 class="text-3xl font-bold mb-6 text-center text-[#63918b]">Livres Empruntés</h2>
+			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+				{% for borrowing in borrowings %}
+					{% set book = borrowing.book %}
+					<div class="bg-white shadow-lg rounded-lg p-5 transition-transform transform hover:scale-105 hover:shadow-xl">
+						<img src="{{ book.image }}" alt="{{ book.title }}" class="w-full h-64 object-cover rounded-lg mb-4">
+						<h3 class="text-xl font-semibold text-[#63918b]">{{ book.title }}</h3>
+						<p class="text-gray-600 text-sm">Auteur : {{ book.author }}</p>
+						<p class="text-gray-500 text-xs">Catégorie : {{ book.category.name }}</p>
+						<p class="text-gray-400 text-xs mt-2">Emprunté le : {{ borrowing.empruntedAt|date('l d F Y à H:i') }}</p>
+						<p class="mt-2 text-sm text-gray-700">{{ book.content|slice(0, 100) }}...</p>
+
+						{% if borrowing.status == 'approved' %}
+							<div class="mt-4 flex justify-center items-center">
+								<a href="{{ path('borrowing_pdf_view', { 'id': borrowing.id }) }}" target="_blank" class="text-[#63918b] hover:text-[#4f7d74] transition duration-300">
+									📄 Voir le rendu
+								</a>
+								<span class="text-gray-500 text-xs ml-4">Retour prévu : {{ borrowing.renderedAt|date('d/m/Y') }}</span>
+							</div>
+						{% endif %}
+
+						<!-- Statut du livre -->
+						<div class="mt-4 mb-2 flex justify-center">
+							{% if borrowing.status == 'waiting' %}
+								<span class="px-4 py-2 bg-yellow-500 rounded-xl text-white text-sm">En attente</span>
+							{% elseif borrowing.status == 'approved' %}
+								<span class="px-4 py-2 bg-green-600 rounded-xl text-white text-sm">Approuvé</span>
+							{% elseif borrowing.status == 'refused' %}
+								<span class="px-4 py-2 bg-red-600 rounded-xl text-white text-sm">Refusé</span>
+							{% elseif borrowing.status == 'returned' %}
+								<span class="px-4 py-2 bg-green-700 rounded-xl text-white text-sm">Retourné</span>
+							{% endif %}
+						</div>
+
+						<!-- Bouton Retourner le livre -->
+						<form action="{{ path('app_delete_borrowing_id', {'id': borrowing.id}) }}" method="post" class="flex justify-center">
+							<button type="submit" class="bg-[#916369] text-white py-2 px-6 rounded-lg hover:bg-[#7b4e50] transition duration-300">
+								Retourner le livre
+							</button>
+						</form>
+					</div>
+				{% endfor %}
+			</div>
+		</div>
+	{% else %}
+		<p class="text-center text-gray-500 mt-8">Aucun emprunt trouvé</p>
+	{% endif %}
+{% endblock %}
