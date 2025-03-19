@@ -3,19 +3,18 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Book;
-use App\Entity\Category;
 use App\Entity\Borrowing;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use DateTimeImmutable;
 
 class BookCrudController extends AbstractCrudController
 {
-    private $entityManager;
+    private EntityManagerInterface $entityManager;
 
     public function __construct(EntityManagerInterface $entityManager)
     {
@@ -29,16 +28,13 @@ class BookCrudController extends AbstractCrudController
 
     public function createEntity(string $entityFqcn)
     {
-        // Créer un livre
+        // Créer un nouveau livre avec des valeurs par défaut
         $book = new Book();
-        $book->setIsFromBdd(true); // Définir isFromBdd à true lors de la création
+        $book->setIsFromBdd(true);
 
-        // Assurez-vous que la catégorie est bien persistée
-        $category = new Category();
-        $this->entityManager->persist($category); // Assurez-vous que la catégorie est gérée avant de l'assigner
-
-        // Tu peux ensuite assigner la catégorie au livre
-        $book->setCategory($category);
+        // Initialiser les dates pour éviter des erreurs en base de données
+        $book->setCreatedAt(new DateTimeImmutable());
+        $book->setPublishedAt(new DateTimeImmutable());
 
         return $book;
     }
@@ -46,22 +42,18 @@ class BookCrudController extends AbstractCrudController
     public function deleteEntity(EntityManagerInterface $entityManager, $entity): void
     {
         if ($entity instanceof Book) {
-            // Supprimer les emprunts associés à ce livre
+            // Supprimer les emprunts liés avant de supprimer le livre
             $borrowings = $entityManager->getRepository(Borrowing::class)->findBy(['book' => $entity]);
 
             foreach ($borrowings as $borrowing) {
                 $entityManager->remove($borrowing);
             }
 
-            // Détacher la catégorie avant de supprimer le livre (optionnel si cascade={"persist", "remove"} est configuré)
-            $entity->setCategory(null);
-
             // Supprimer le livre
             $entityManager->remove($entity);
             $entityManager->flush();
         }
     }
-
 
     public function configureFields(string $pageName): iterable
     {
@@ -72,10 +64,10 @@ class BookCrudController extends AbstractCrudController
             TextField::new('image', 'Image'),
             TextField::new('url', 'Url'),
             AssociationField::new('category', 'Catégorie')
-                ->setCrudController(CategoryCrudController::class) // Lien vers le gestionnaire de catégories
-                ->setRequired(true), // Facultatif : rendre le champ obligatoire pour un livre
-            DateField::new('created_at', 'Créé le'),
-            DateField::new('published_at', 'Publié le'),
+                ->setCrudController(CategoryCrudController::class)
+                ->setRequired(true),
+            DateField::new('created_at', 'Créé le')->setRequired(true),
+            DateField::new('published_at', 'Publié le')->setRequired(true),
         ];
     }
 }
