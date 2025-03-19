@@ -273,6 +273,9 @@ class BookController extends AbstractController
             $entityManager->persist($newBorrowing);
             $entityManager->flush();
 
+            $this->addFlash('success', "Votre emprunt a bien été enregistré et soumis à l'autorisation de l'administrateur !");
+
+
             return $this->render('books/book-bdd.html.twig', [
                 'book' => $book,
             ]);
